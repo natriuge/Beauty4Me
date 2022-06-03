@@ -17,6 +17,8 @@ const ProductSchema = new Schema({
   favoritedBy: [{ type: Types.ObjectId, ref: "User" }],
 });
 
+//teste
+
 const ProductModel = model("Product", ProductSchema);
 
 module.exports = ProductModel;
