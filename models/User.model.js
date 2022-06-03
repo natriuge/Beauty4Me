@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, Types, model } = require("mongoose");
 
 const UserSchema = new Schema({
   name: { type: String, required: true, trim: true },
@@ -10,12 +10,9 @@ const UserSchema = new Schema({
     lowercase: true,
   },
   passwordHash: { type: String, required: true },
-  role: {
-    type: String,
-    enum: ["ADMIN", "USER"],
-    required: true,
-    default: "USER",
-  },
+  skinType: { type: String },
+  favoriteProducts: [{ type: Types.ObjectId, ref: "Product" }],
+  reviews: [{ type: Types.ObjectId, ref: "Review" }],
 });
 
 const UserModel = model("User", UserSchema);
