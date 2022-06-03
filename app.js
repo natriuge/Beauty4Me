@@ -26,7 +26,7 @@ const productRouter = require("./routers/product.router");
 app.use("/", productRouter);
 const reviewRouter = require("./routers/review.router");
 app.use("/", reviewRouter);
-
+// Oi gente
 app.listen(Number(process.env.PORT), () =>
   console.log(`Server up and running at port ${process.env.PORT}`)
 );
