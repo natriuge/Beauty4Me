@@ -4,12 +4,11 @@ const ProductModel = require("../models/Product.model");
 const ReviewModel = require("../models/Review.model");
 const UserModel = require("../models/User.model");
 
-// Rota de produtos favoritos
-router.post("/product", isAuthenticated, async (req, res) => {
+// Rota de produtos sem auth
+router.post("/product", async (req, res) => {
   try {
-    // Extraindo o id do usuário logado
-    const { _id } = req.user;
-    const result = await Product.create({ ...req.body, ownerId: _id });
+    const data = req.body;
+    const result = await ProductModel.create({ ...data });
 
     return res.status(201).json(result);
   } catch (err) {
@@ -18,10 +17,11 @@ router.post("/product", isAuthenticated, async (req, res) => {
   }
 });
 
-// GET 
-router.get("/room", isAuthenticated, async (req, res) => {
+router.get("/product/:_id", async (req, res) => {
   try {
-    const result = await Room.find();
+    const { _id } = req.params;
+
+    const result = await ProductModel.findOne({ _id });
 
     return res.status(200).json(result);
   } catch (err) {
@@ -30,53 +30,79 @@ router.get("/room", isAuthenticated, async (req, res) => {
   }
 });
 
-router.get("/room/:_id", isAuthenticated, async (req, res) => {
-  try {
-    const { _id } = req.params;
+// // Rota de produtos favoritos
+// router.post("/product", isAuthenticated, async (req, res) => {
+//   try {
+//     // Extraindo o id do usuário logado
+//     const { _id } = req.user;
+//     const result = await Product.create({ ...req.body, ownerId: _id });
 
-    const result = await Room.findOne({ _id })
-      .populate("reviews") // carregar todos os objetos de review no lugar de somente os ids
-      .populate("ownerId", "-passwordHash"); // carregar todos os dados de usuário no lugar de somente o id, porém não enviar a senha
+//     return res.status(201).json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
+// });
 
-    return res.status(200).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Internal server error." });
-  }
-});
+// // GET
+// router.get("/room", isAuthenticated, async (req, res) => {
+//   try {
+//     const result = await Room.find();
 
-router.patch("/room/:_id", isAuthenticated, async (req, res) => {
-  try {
-    const { _id } = req.params;
+//     return res.status(200).json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
+// });
 
-    const result = await Room.findOneAndUpdate(
-      { _id },
-      { $set: req.body },
-      { new: true, runValidators: true }
-    );
+// router.get("/room/:_id", isAuthenticated, async (req, res) => {
+//   try {
+//     const { _id } = req.params;
 
-    return res.status(200).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Internal server error." });
-  }
-});
+//     const result = await Room.findOne({ _id })
+//       .populate("reviews") // carregar todos os objetos de review no lugar de somente os ids
+//       .populate("ownerId", "-passwordHash"); // carregar todos os dados de usuário no lugar de somente o id, porém não enviar a senha
 
-router.delete("/room/:_id", isAuthenticated, async (req, res) => {
-  try {
-    const { _id } = req.params;
+//     return res.status(200).json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
+// });
 
-    // Deleta a acomodação
-    const result = await Room.findOneAndDelete({ _id }, { new: true });
+// router.patch("/room/:_id", isAuthenticated, async (req, res) => {
+//   try {
+//     const { _id } = req.params;
 
-    // Deleta todos os reviews dessa acomodação
-    await Review.deleteMany({ roomId: _id });
+//     const result = await Room.findOneAndUpdate(
+//       { _id },
+//       { $set: req.body },
+//       { new: true, runValidators: true }
+//     );
 
-    return res.status(200).json({});
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Internal server error." });
-  }
-});
+//     return res.status(200).json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
+// });
+
+// router.delete("/room/:_id", isAuthenticated, async (req, res) => {
+//   try {
+//     const { _id } = req.params;
+
+//     // Deleta a acomodação
+//     const result = await Room.findOneAndDelete({ _id }, { new: true });
+
+//     // Deleta todos os reviews dessa acomodação
+//     await Review.deleteMany({ roomId: _id });
+
+//     return res.status(200).json({});
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
+// });
 
 module.exports = router;
