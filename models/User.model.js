@@ -22,4 +22,3 @@ const UserModel = model("User", UserSchema);
 
 module.exports = UserModel;
 
-//pelo amor vai
