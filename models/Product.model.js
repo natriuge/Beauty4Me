@@ -2,8 +2,8 @@ const { Schema, Types, model } = require("mongoose");
 
 const ProductSchema = new Schema({
   productName: { type: String },
-  image240: { type: String },
-  image135: { type: String },
+  imageDetails: { type: String },
+  imageIcon: { type: String },
   shortDescription: { type: String },
   longDescription: { type: String },
   brandName: { type: String },
@@ -11,10 +11,10 @@ const ProductSchema = new Schema({
   ingredients: { type: String },
   rating: { type: Number },
   averagePrice: { type: Number },
-  highlights: [{ type: Boolean }],
+  productSkinType: [{ type: String }],
+  category: [{ type: String }],
   reviews: [{ type: Types.ObjectId, ref: "Review" }],
-  favoritedBy: [{ type: Types.ObjectId, ref: "User" }]
-
+  favoritedBy: [{ type: Types.ObjectId, ref: "User" }],
 });
 
 const ProductModel = model("Product", ProductSchema);
