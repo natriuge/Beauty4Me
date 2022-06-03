@@ -10,7 +10,10 @@ const UserSchema = new Schema({
     lowercase: true,
   },
   passwordHash: { type: String, required: true },
-  skinType: { type: String },
+  userSkinType: {
+    type: String,
+    enum: ["Normal", "Dry", "Oily", "Combination"],
+  },
   favoriteProducts: [{ type: Types.ObjectId, ref: "Product" }],
   reviews: [{ type: Types.ObjectId, ref: "Review" }],
 });
