@@ -20,6 +20,8 @@ app.use(cors({ origin: process.env.REACT_APP_URL }));
 //   })
 //   .catch((err) => console.error(err));
 
+//tá frio!
+
 const userRouter = require("./routes/user.routes");
 app.use("/api", userRouter);
 const productRouter = require("./routers/product.router");
