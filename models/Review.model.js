@@ -1,6 +1,6 @@
 const { Schema, Types, model } = require("mongoose");
 
-const reviewSchema = new Schema({
+const ReviewSchema = new Schema({
   authorId: { type: Types.ObjectId, ref: "User" },
   comment: { type: String, maxlength: 200 },
   authorRating: { type: Number },
