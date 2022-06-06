@@ -47,7 +47,7 @@ const UserModel = require("../models/User.model");
 //   });
 
 //variavel onde vamos colocar todas as nossas categorias de produtos
-let productsCategories = ["toner", "vitamin C"];
+let productsCategories = ["toner"];
 //chamando a nossa função que se conecta com a api e passando o parametro de busca (que é cada categoria das nossa lista de categorias) => será o nosso searchParam da função "connectSearchApiSephora"
 async function exec(category) {
   const categoryResList = await connectSearchApiSephora(category); //category é o params de pesquisa da connectSearchApiSephora
@@ -56,14 +56,28 @@ async function exec(category) {
       categoryRes.productId_sephora, // buscando na categoria o id de cada produto dessa categoria
       categoryRes.preferedSku // buscando na categoria o preferedsku
     );
-    let RESPOSTA = mapper_details(categoryRes, categoryResDetails);// passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
-    // console.log("HOLA QUE TAL", RESPOSTA);
+
+    let RESPOSTA = mapper_details(categoryRes, categoryResDetails); // passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
+    // console.log("Objeto final com todas infos", RESPOSTA);
+
+    // for (RESPOSTAList of RESPOSTA) {
+    //   const categoryResReviews = await connectReviewsApiSephora(
+    //     RESPOSTAList.UserNickname,
+    //     RESPOSTAList.Rating,
+    //     RESPOSTAList.ReviewText,
+    //     RESPOSTAList.ProductId
+    //   );
+
+    //   let objFinalParaPostBD = mapper_reviews(RESPOSTAList, categoryResReviews);
+    //   console.log("objeto FINAL LINDÃO", objFinalParaPostBD);
+    // }
   }
-} 
+}
+console.log(RESPOSTA);
 //função que tá cagada (por enquanto):
 
 // async function execRev(category) {
-//  const categoryResList = await connectSearchApiSephora(category); 
+//  const categoryResList = await connectSearchApiSephora(category);
 //  for (categoryRes of categoryResList) {
 //    const categoryResReviews = await connectReviewsApiSephora(
 //      categoryRes.productId
@@ -86,10 +100,10 @@ async function connectSearchApiSephora(searchParam) {
       method: "GET",
       url: "https://sephora.p.rapidapi.com/products/search",
       //params: "chave" de busca dinâmica;
-      params: { q: searchParam, pageSize: "60", currentPage: "1" },
+      params: { q: searchParam, pageSize: "1", currentPage: "1" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": "740818ed14msh8a6a37593e82ec7p18db7ajsn40133cedf6ec",
+        "X-RapidAPI-Key": process.env.X_RapidAPI_Key,
       },
     }); //variavel que pega os produtos retornados na response
     let productList = [...response.data.products];
@@ -111,7 +125,7 @@ function connectDetailsApiSephora(productId, preferedSku) {
       params: { productId: productId, preferedSku: preferedSku },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": "740818ed14msh8a6a37593e82ec7p18db7ajsn40133cedf6ec",
+        "X-RapidAPI-Key": process.env.X_RapidAPI_Key,
       },
     })
     .then(function (response) {
@@ -128,10 +142,10 @@ function connectReviewsApiSephora(ProductId) {
     .request({
       method: "GET",
       url: "https://sephora.p.rapidapi.com/reviews/list",
-      params: { ProductId: ProductId, Limit: "60", Offset: "0" },
+      params: { ProductId: ProductId, Limit: "1", Offset: "0" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": "740818ed14msh8a6a37593e82ec7p18db7ajsn40133cedf6ec",
+        "X-RapidAPI-Key": process.env.X_RapidAPI_Key,
       },
     })
     .then(function (response) {
@@ -141,10 +155,9 @@ function connectReviewsApiSephora(ProductId) {
     .catch(function (error) {
       console.error(error);
     });
-}    
+}
 // let testId = "P427406";
 // connectReviewsApiSephora(testId)
-
 
 // const toner = connectApiSephora("Toner");
 // const moisturizing = connectApiSephora("moisturizing");
@@ -180,7 +193,7 @@ function mapper_search_allTypes_products(obj_search) {
     preferedSku: obj_search.currentSku.skuId,
   };
 }
-//fução mapper da rota de detalhes do produto; 
+//fução mapper da rota de detalhes do produto;
 function mapper_details(obj_search, obj_details) {
   return {
     ...obj_search, //retornando o nosso obj da rota search e acrescentando também os detalhes que estavam em outra rota(rota de details).
@@ -191,7 +204,7 @@ function mapper_details(obj_search, obj_details) {
   };
 }
 
-function mapper_reviews(obj_reviews){
+function mapper_reviews(obj_reviews) {
   return {
     UserNickname: obj_reviews.UserNickname,
     Rating: obj_reviews.Rating,
@@ -201,8 +214,6 @@ function mapper_reviews(obj_reviews){
 }
 
 init();
-
-
 
 // router.get("/product/search", async (req, res) => {
 //   try {
