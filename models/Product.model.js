@@ -12,7 +12,7 @@ const ProductSchema = new Schema({
   rating: { type: Number },
   averagePrice: { type: Number },
   productSkinType: [{ type: String }],
-  category: [{ type: String }],
+  category: { type: String },
   reviews: [{ type: Types.ObjectId, ref: "Review" }],
   favoritedBy: [{ type: Types.ObjectId, ref: "User" }],
 });
