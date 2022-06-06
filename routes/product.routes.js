@@ -33,32 +33,24 @@ async function exec(category) {
     // console.log("teste da api", RESPOSTA);
   }
 } 
-// async function getReviews(){
-//   const reviewsByCategory = await connectReviewsApiSephora()
-// }
-
-//  const categoryResReviews = await connectReviewsApiSephora(
-//    categoryRes.productId_sephora
-//  );
-// let response = mapper_reviews(categoryRes, categoryResReviews);
-// console.log("teste da api", response);
-//função que tá cagada (por enquanto):
-
-// async function execRev(category) {
-//  const categoryResList = await connectSearchApiSephora(category); 
-//  for (categoryRes of categoryResList) {
-//    const categoryResReviews = await connectReviewsApiSephora(
-//      categoryRes.productId
-//    );
-//      let RESPOSTAB = mapper_reviews(categoryRes, categoryResReviews); //essa variavel será a nossa resposta com o obj do review
-//      console.log("oi", RESPOSTAB);
-//  }
-// }
+async function execRev(category) {
+  const categoryResList = await connectSearchApiSephora(category); 
+  for (categoryRes of categoryResList) {
+    const categoryResReviews = await connectReviewsApiSephora(categoryRes.productId);
+    let responseb = mapper_reviews(categoryRes, categoryResReviews);
+    console.log("response", responseb)
+  }
+}
 
 //essa função de init faz um loop na nossa array de categorias passando por cada uma;
 async function init() {
   for (let category of productsCategories) {
     await exec(category);
+  }
+}
+async function init2() {
+  for (let category of productsCategories) {
+    await execRev(category);
   }
 }
 //configuração para conexão com a rota search da api da Sephora
@@ -71,13 +63,13 @@ async function connectSearchApiSephora(searchParam) {
       params: { q: searchParam, pageSize: "60", currentPage: "1" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": "57669a5ae8msh4540f199461dc37p1eb681jsn73b4357fca1f",
+        "X-RapidAPI-Key": "c96a859380msh45304c9f8873b44p18a3e7jsncca7317743c9",
       },
     }); //variavel que pega os produtos retornados na response
     let productList = [...response.data.products]
     //cada produto sendo iterado e retornado "bonitinho" através da função mapper que trás apenas os dados que precisamos pro proj;
     return productList.map((product) =>
-      mapper_search_allTypes_products(product)
+      mapper_search_allTypes_products(product) 
     );
   } catch (error) {
     console.error(error);
@@ -93,7 +85,7 @@ function connectDetailsApiSephora(productId, preferedSku) {
       params: { productId: productId, preferedSku: preferedSku },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": "57669a5ae8msh4540f199461dc37p1eb681jsn73b4357fca1f",
+        "X-RapidAPI-Key": "c96a859380msh45304c9f8873b44p18a3e7jsncca7317743c9",
       },
     })
     .then(function (response) {
@@ -112,18 +104,18 @@ function connectReviewsApiSephora(ProductId) {
       params: { ProductId: ProductId, Limit: "60", Offset: "0" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": "57669a5ae8msh4540f199461dc37p1eb681jsn73b4357fca1f",
+        "X-RapidAPI-Key": "c96a859380msh45304c9f8873b44p18a3e7jsncca7317743c9",
       },
     })
     .then(function (response) {
-      // console.log("oxente", response.data);
-      const reviews = [...response.data]
       return response.data;
     })
     .catch(function (error) {
       console.error(error);
     });
 }    
+// let testId = "P454378";
+// console.log(connectReviewsApiSephora(testId));
 
 // const toner = connectApiSephora("Toner");
 // const moisturizing = connectApiSephora("moisturizing");
@@ -170,7 +162,7 @@ function mapper_details(obj_search, obj_details) {
   };
 }
 
-function mapper_reviews(obj_reviews){
+function mapper_reviews( obj_reviews){
   return {
     UserNickname: obj_reviews.UserNickname,
     Rating: obj_reviews.Rating,
@@ -181,6 +173,7 @@ function mapper_reviews(obj_reviews){
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
 
 init();
+init2()
 
 //ROTAS DO PRODUTO:
 
