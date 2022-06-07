@@ -10,7 +10,7 @@ const salt_rounds = 10;
 
 // Crud (CREATE) - HTTP POST
 // Criar um novo usuário
-router.post("/signup", async (req, res) => {
+router.post("/signup", isAuthenticated, async (req, res) => {
   // Requisições do tipo POST tem uma propriedade especial chamada body, que carrega a informação enviada pelo cliente
   console.log(req.body);
 
@@ -81,7 +81,6 @@ router.post("/login", async (req, res) => {
           name: user.name,
           email: user.email,
           _id: user._id,
-          role: user.role,
         },
         token,
       });
@@ -117,4 +116,3 @@ router.get("/profile", isAuthenticated, attachCurrentUser, (req, res) => {
 });
 
 module.exports = router;
-//teste nat
