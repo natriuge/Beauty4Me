@@ -6,43 +6,47 @@ const ReviewModel = require("../models/Review.model");
 const UserModel = require("../models/User.model");
 
 // Rota de produtos sem auth
-// // router.post("/product", async (req, res) => {
-// //   try {
-// //     const data = req.body;
-// //     const result = await ProductModel.create({ ...data });
+// router.post("/products", async (req, res) => {
+//   try {
+//     const data = productDetails;
+//     const result = await ProductModel.create({ ...data });
 
-// //     return res.status(201).json(result);
-// //   } catch (err) {
-// //     console.error(err);
-// //     return res.status(500).json({ msg: "Internal server error." });
-// //   }
-// //
+//     return res.status(201).json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
 // });
 
 //variavel onde vamos colocar todas as nossas categorias de produtos
 let productsCategories = ["toner", "vitamin C"];
 //chamando a nossa função que se conecta com a api e passando o parametro de busca (que é cada categoria das nossa lista de categorias) => será o nosso searchParam da função "connectSearchApiSephora"
 async function exec(category) {
- 
-  const categoryResList = await connectSearchApiSephora(category); //category é o params de pesquisa da connectSearchApiSephora
+  const categoryResList = await connectSearchApiSephora(category);
+  //category é o params de pesquisa da connectSearchApiSephora
   for (categoryRes of categoryResList) {
+    //categoryRes é um objeto individual
+    //categoryResList é o conjunto de objetos
     const categoryResDetails = await connectDetailsApiSephora(
       categoryRes.productId_sephora, // buscando na categoria o id de cada produto dessa categoria
       categoryRes.preferedSku // buscando na categoria o preferedsku
     );
-    let RESPOSTA= mapper_details(categoryRes, categoryResDetails);// passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
-
-    console.log("teste da api", RESPOSTA);
+    let productDetails = mapper_details(categoryRes, categoryResDetails); // passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
+    // console.log("teste da api", RESPOSTA);
   }
-} 
-
+}
 
 async function execRev(category) {
-  const categoryResList = await connectSearchApiSephora(category); 
+  const categoryResList = await connectSearchApiSephora(category);
   for (categoryRes of categoryResList) {
-    const categoryResReviews = await connectReviewsApiSephora(categoryRes.productId_sephora);
-    let responseb = mapper_reviews(categoryResReviews);
-    // console.log("response", responseb)
+    const categoryResReviews = await connectReviewsApiSephora(
+      categoryRes.productId_sephora
+    );
+
+    let productReviews = categoryResReviews.Results.map((elem) =>
+      mapper_reviews(elem)
+    );
+    console.log(productReviews);
   }
 } 
 
@@ -64,16 +68,17 @@ async function connectSearchApiSephora(searchParam) {
       method: "GET",
       url: "https://sephora.p.rapidapi.com/products/search",
       //params: "chave" de busca dinâmica;
-      params: { q: searchParam, pageSize: "60", currentPage: "1" },
+      params: { q: searchParam, pageSize: "5", currentPage: "1" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": process.env.X_RapidAPI_Key,
+        "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
+
       },
     }); //variavel que pega os produtos retornados na response
-    let productList = [...response.data.products]
+    let productList = [...response.data.products];
     //cada produto sendo iterado e retornado "bonitinho" através da função mapper que trás apenas os dados que precisamos pro proj;
     return productList.map((product) =>
-      mapper_search_allTypes_products(product) 
+      mapper_search_allTypes_products(product)
     );
   } catch (error) {
     console.error(error);
@@ -89,7 +94,7 @@ function connectDetailsApiSephora(productId, preferedSku) {
       params: { productId: productId, preferedSku: preferedSku },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": process.env.X_RapidAPI_Key,
+        "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
       },
     })
     .then(function (response) {
@@ -105,10 +110,10 @@ function connectReviewsApiSephora(ProductId) {
     .request({
       method: "GET",
       url: "https://sephora.p.rapidapi.com/reviews/list",
-      params: { ProductId: ProductId, Limit: "60", Offset: "0" },
+      params: { ProductId: ProductId, Limit: "5", Offset: "0" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": process.env.X_RapidAPI_Key,
+        "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
       },
     })
     .then(function (response) {
@@ -117,7 +122,7 @@ function connectReviewsApiSephora(ProductId) {
     .catch(function (error) {
       console.error(error);
     });
-}    
+}
 // let testId = "P454378";
 // console.log(connectReviewsApiSephora(testId));
 
@@ -155,7 +160,7 @@ function mapper_search_allTypes_products(obj_search) {
     preferedSku: obj_search.currentSku.skuId,
   };
 }
-//fução mapper da rota de detalhes do produto; 
+//fução mapper da rota de detalhes do produto;
 function mapper_details(obj_search, obj_details) {
   return {
     ...obj_search, //retornando o nosso obj da rota search e acrescentando também os detalhes que estavam em outra rota(rota de details).
@@ -166,7 +171,7 @@ function mapper_details(obj_search, obj_details) {
   };
 }
 
-function mapper_reviews(obj_reviews){
+function mapper_reviews(obj_reviews) {
   return {
   
     UserNickname: obj_reviews.UserNickname,
@@ -178,15 +183,14 @@ function mapper_reviews(obj_reviews){
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
 
 init();
-init2()
+init2();
 
 //ROTAS DO PRODUTO:
 
-
 //1. POST.CREATE (rota que vai postar no nosso banco de dados o valor que vem da api da Sephora),
-//2. GET.SEARCH (rota que pega os produtos que foram postados no nosso banco de dados, que são a reposta vinda da api da sephora), 
+//2. GET.SEARCH (rota que pega os produtos que foram postados no nosso banco de dados, que são a reposta vinda da api da sephora),
 //3. GET.FINDONE e GET.FINDMANY (rotas de pesquisa do ranking),
-//4. 
+//4.
 
 // router.get("/product/search", async (req, res) => {
 //   try {

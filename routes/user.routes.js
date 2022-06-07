@@ -117,4 +117,3 @@ router.get("/profile", isAuthenticated, attachCurrentUser, (req, res) => {
 });
 
 module.exports = router;
-//teste nat
