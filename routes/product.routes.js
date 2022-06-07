@@ -6,18 +6,17 @@ const ReviewModel = require("../models/Review.model");
 const UserModel = require("../models/User.model");
 
 // Rota de produtos sem auth
-router.post("/products", async (req, res) => {
-  try {
-    const data = productDetails;
-    const result = await ProductModel.create({ ...data });
+// router.post("/products", async (req, res) => {
+//   try {
+//     const data = req.body;
+//     const result = await ProductModel.create({ ...data });
 
-    return res.status(201).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Internal server error." });
-  }
-
-});
+//     return res.status(201).json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
+// });
 
 //variavel onde vamos colocar todas as nossas categorias de produtos
 let productsCategories = ["toner", "vitamin C"];
@@ -43,7 +42,7 @@ async function execRev(category) {
     const categoryResReviews = await connectReviewsApiSephora(
       categoryRes.productId_sephora
     );
-
+    //BUG FIXED!
     let productReviews = categoryResReviews.Results.map((elem) =>
       mapper_reviews(elem)
     );
@@ -71,7 +70,7 @@ async function connectSearchApiSephora(searchParam) {
       params: { q: searchParam, pageSize: "5", currentPage: "1" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": "0a0fd6fa4cmshf3290280799944dp18aa0bjsn6bfe8c5f3a5c",
+        "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
       },
     }); //variavel que pega os produtos retornados na response
     let productList = [...response.data.products];
@@ -93,7 +92,7 @@ function connectDetailsApiSephora(productId, preferedSku) {
       params: { productId: productId, preferedSku: preferedSku },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": "0a0fd6fa4cmshf3290280799944dp18aa0bjsn6bfe8c5f3a5c",
+        "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
       },
     })
     .then(function (response) {
@@ -112,7 +111,7 @@ function connectReviewsApiSephora(ProductId) {
       params: { ProductId: ProductId, Limit: "5", Offset: "0" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": "0a0fd6fa4cmshf3290280799944dp18aa0bjsn6bfe8c5f3a5c",
+        "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
       },
     })
     .then(function (response) {
