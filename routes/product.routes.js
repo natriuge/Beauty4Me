@@ -32,6 +32,12 @@ async function exec(category) {
       categoryRes.productId_sephora, // buscando na categoria o id de cada produto dessa categoria
       categoryRes.preferedSku // buscando na categoria o preferedsku
     );
+  }
+}
+
+async function execRev(category) {
+  const categoryResList = await connectSearchApiSephora(category);
+  for (categoryRes of categoryResList) {
     const categoryResReviews = await connectReviewsApiSephora(
       categoryRes.productId_sephora
     );
@@ -43,25 +49,13 @@ async function exec(category) {
     ); // passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
     console.log("MUNDO MARAVILHOSO E LINDO", productDetails);
   }
-}
-// async function execRev(category) {
-//   const categoryResList = await connectSearchApiSephora(category);
-//   for (categoryRes of categoryResList) {
-//     const categoryResReviews = await connectReviewsApiSephora(
-//       categoryRes.productId_sephora
-//     );
 
-//     let productReviews = categoryResReviews.Results.map((elem) =>
-//       mapper_reviews(elem)
-//     );
-//     console.log(productReviews);
-//   }
-// }
+} 
 
 //essa função de init faz um loop na nossa array de categorias passando por cada uma;
 async function init() {
   for (let category of productsCategories) {
-    await exec(category);
+   let result = await exec(category);
   }
 }
 // async function init2() {
@@ -80,6 +74,7 @@ async function connectSearchApiSephora(searchParam) {
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
         "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
+
       },
     }); //variavel que pega os produtos retornados na response
     let productList = [...response.data.products];
@@ -187,6 +182,7 @@ function mapper_details_reviews(obj_search, obj_details, obj_reviews) {
 //     ProductId: obj_reviews.ProductId,
 //   };
 // }
+
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
 
 init();
@@ -235,18 +231,18 @@ init();
 // });
 
 // // Rota de produtos favoritos
-// router.post("/product", isAuthenticated, async (req, res) => {
-//   try {
-//     // Extraindo o id do usuário logado
-//     const { _id } = req.user;
-//     const result = await Product.create({ ...req.body, ownerId: _id });
+router.post("/product",  async (req, res) => {
+  try {
+    // Extraindo o id do usuário logado
+  
+    const result = await Product.create({ ...req.body });
 
-//     return res.status(201).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
+    return res.status(201).json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Internal server error." });
+  }
+});
 
 // // GET
 // router.get("/room", isAuthenticated, async (req, res) => {
