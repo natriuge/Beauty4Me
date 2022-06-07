@@ -31,11 +31,11 @@ async function exec(category) {
       categoryRes.productId_sephora, // buscando na categoria o id de cada produto dessa categoria
       categoryRes.preferedSku // buscando na categoria o preferedsku
     );
-
     let productDetails = mapper_details(categoryRes, categoryResDetails); // passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
     // console.log("teste da api", RESPOSTA);
   }
 }
+
 async function execRev(category) {
   const categoryResList = await connectSearchApiSephora(category);
   for (categoryRes of categoryResList) {
@@ -48,12 +48,12 @@ async function execRev(category) {
     );
     console.log(productReviews);
   }
-}
+} 
 
 //essa função de init faz um loop na nossa array de categorias passando por cada uma;
 async function init() {
   for (let category of productsCategories) {
-    await exec(category);
+   let result = await exec(category);
   }
 }
 async function init2() {
@@ -72,6 +72,7 @@ async function connectSearchApiSephora(searchParam) {
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
         "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
+
       },
     }); //variavel que pega os produtos retornados na response
     let productList = [...response.data.products];
@@ -153,7 +154,7 @@ function mapper_search_allTypes_products(obj_search) {
     ingredients: "",
     rating: Number(Number(obj_search.rating).toFixed(2)),
     averagePrice: obj_search.currentSku.listPrice,
-    productSkinType: "oil",
+    productSkinType: "oil", 
     category: getCategoryTranslation(obj_search.displayName),
     productId_sephora: obj_search.productId,
     preferedSku: obj_search.currentSku.skuId,
@@ -172,10 +173,11 @@ function mapper_details(obj_search, obj_details) {
 
 function mapper_reviews(obj_reviews) {
   return {
+  
     UserNickname: obj_reviews.UserNickname,
     Rating: obj_reviews.Rating,
     ReviewText: obj_reviews.ReviewText,
-    ProductId: obj_reviews.ProductId,
+    ProductId_sephora: obj_reviews.ProductId,
   };
 }
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
@@ -226,18 +228,18 @@ init2();
 // });
 
 // // Rota de produtos favoritos
-// router.post("/product", isAuthenticated, async (req, res) => {
-//   try {
-//     // Extraindo o id do usuário logado
-//     const { _id } = req.user;
-//     const result = await Product.create({ ...req.body, ownerId: _id });
+router.post("/product",  async (req, res) => {
+  try {
+    // Extraindo o id do usuário logado
+  
+    const result = await Product.create({ ...req.body });
 
-//     return res.status(201).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
+    return res.status(201).json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Internal server error." });
+  }
+});
 
 // // GET
 // router.get("/room", isAuthenticated, async (req, res) => {
