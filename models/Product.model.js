@@ -19,7 +19,5 @@ const ProductSchema = new Schema({
   allProductReviews: [{ type: Types.ObjectId, ref: "Review" }],
   favoritedBy: [{ type: Types.ObjectId, ref: "User" }],
 });
-
 const ProductModel = model("Product", ProductSchema);
-
 module.exports = ProductModel;

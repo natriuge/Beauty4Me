@@ -31,8 +31,10 @@ router.post("/review", isAuthenticated, async (req, res) => {
   }
 });
 
-//rota de atualizar uma review (patch)
+//rota de atualizar uma review (patch)-> VERIFICAR DE O ID DO DONO DO REVIEW É DO MESMO DO USER
+//LEMBRAR DE AUTENTICAR TUDO
 
-// rota de deletar uma review (delete)
+// rota de deletar uma review (delete) -> VERIFICAR DE O ID DO DONO DO REVIEW É DO MESMO DO USER
+//LEMBRAR DE AUTENTICAR TUDO
 
 module.exports = router;
