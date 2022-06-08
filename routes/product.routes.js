@@ -21,15 +21,15 @@ const UserModel = require("../models/User.model");
 
 //variavel onde vamos colocar todas as nossas categorias de produtos
 let productsCategories = [
-"cleanser",
-"moisturizing", 
-"hyaluronic acid", 
-"niacinamide acid",
-"glycolic acid",
-"vitamin C",
-"mandelic acid",
-"eye cream",
-"mask"
+  "cleanser",
+  "moisturizing",
+  "hyaluronic acid",
+  "niacinamide acid",
+  "glycolic acid",
+  "vitamin C",
+  "mandelic acid",
+  "eye cream",
+  "mask",
 ];
 //chamando a nossa função que se conecta com a api e passando o parametro de busca (que é cada categoria das nossa lista de categorias) => será o nosso searchParam da função "connectSearchApiSephora"
 async function exec(category) {
@@ -327,6 +327,43 @@ init();
 //   }
 // });
 
+//GET - find
+router.get("/products", async (req, res) => {
+  try {
+    let { page, limit } = req.query;
+
+    page = Number(page) || 0;
+    limit = Number(limit) || 20;
+
+    const result = await ProductModel.find()
+      .skip(page * limit)
+      .limit(limit);
+
+    return res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Internal server error." });
+  }
+});
+
+//GET - findOne
+router.get("/product/:_id", async (req, res) => {
+  try {
+    const { _id } = req.params;
+
+    const product = await ProductModel.findOne({ _id });
+
+    if (!product) {
+      return res.status(404).json({ msg: "Product not found!" });
+    }
+
+    return res.status(200).json(product);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "failed to find product." });
+  }
+});
+
 module.exports = router;
 
 //GET - find
@@ -366,12 +403,11 @@ router.get("/product/:_id", async (req, res) => {
   }
 });
 
-//post inserindo 
-
+//post inserindo
 
 // router.?("/",  isAuthenticaded , async (req, res) => {
 //   const {_id} =  req.params;
 
-//   const favoriteProduct = await UserModel.//push() 
+//   const favoriteProduct = await UserModel.//push()
 
-  //rota do ranking-> maior para o menorr; 
+//rota do ranking-> maior para o menorr;
