@@ -32,15 +32,6 @@ async function exec(category) {
       categoryRes.productId_sephora, // buscando na categoria o id de cada produto dessa categoria
       categoryRes.preferedSku // buscando na categoria o preferedsku
     );
-<<<<<<< HEAD
-=======
-  }
-}
-
-async function execRev(category) {
-  const categoryResList = await connectSearchApiSephora(category);
-  for (categoryRes of categoryResList) {
->>>>>>> 8f7f8adfe3c6fae001cc581b90b8f8106705e4ee
     const categoryResReviews = await connectReviewsApiSephora(
       categoryRes.productId_sephora
     );
@@ -78,11 +69,7 @@ async function execRev(category) {
 //essa função de init faz um loop na nossa array de categorias passando por cada uma;
 async function init() {
   for (let category of productsCategories) {
-<<<<<<< HEAD
     await exec(category);
-=======
-    let result = await exec(category);
->>>>>>> 8f7f8adfe3c6fae001cc581b90b8f8106705e4ee
   }
 }
 // async function init2() {
