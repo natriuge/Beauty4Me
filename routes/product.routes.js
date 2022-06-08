@@ -5,20 +5,6 @@ const ProductModel = require("../models/Product.model");
 const ReviewModel = require("../models/Review.model");
 const UserModel = require("../models/User.model");
 
-// Rota de produtos sem auth
-// router.post("/products", async (req, res) => {
-//   try {
-//     const data = productDetails;
-//     const result = await ProductModel.create({ ...data });
-
-//     return res.status(500).json({ msg: "Internal server error." });
-//     return res.status(201).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
-
 //variavel onde vamos colocar todas as nossas categorias de produtos
 let productsCategories = [
   "cleanser",
@@ -62,19 +48,6 @@ async function exec(category) {
     // console.log(resultForBD);
   }
 }
-// async function execRev(category) {
-//   const categoryResList = await connectSearchApiSephora(category);
-//   for (categoryRes of categoryResList) {
-//     const categoryResReviews = await connectReviewsApiSephora(
-//       categoryRes.productId_sephora
-//     );
-
-//     let productReviews = categoryResReviews.Results.map((elem) =>
-//       mapper_reviews(elem)
-//     );
-//     console.log(productReviews);
-//   }
-// }
 
 //essa função de init faz um loop na nossa array de categorias passando por cada uma;
 async function init() {
@@ -82,11 +55,7 @@ async function init() {
     await exec(category);
   }
 }
-// async function init2() {
-//   for (let category of productsCategories) {
-//     await execRev(category);
-//   }
-// }
+
 //configuração para conexão com a rota search da api da Sephora
 async function connectSearchApiSephora(searchParam) {
   try {
@@ -149,11 +118,6 @@ function connectReviewsApiSephora(ProductId) {
     });
 }
 
-// console.log(connectReviewsApiSephora(testId));
-
-// const toner = connectApiSephora("Toner");
-// const moisturizing = connectApiSephora("moisturizing");
-
 // SUGESTÃO => arquivo separado os mappers
 function getCategoryTranslation(batata) {
   if (batata.toLowerCase().indexOf("peel") > -1) {
@@ -185,6 +149,7 @@ function mapper_search_allTypes_products(obj_search) {
     preferedSku: obj_search.currentSku.skuId,
   };
 }
+
 //fução mapper da rota de detalhes do produto;
 function mapper_details_reviews(obj_search, obj_details, obj_reviews) {
   return {
@@ -208,7 +173,6 @@ function mapper_reviews(obj_reviews) {
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
 
 init();
-// init2();
 
 //ROTAS DO PRODUTO:
 
@@ -228,30 +192,6 @@ init();
 //   }
 // });
 
-// router.get("/product/", async (req, res) => {
-//   try {
-//     const result = await ProductModel.find({ _id }); //
-
-//     return res.status(200).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
-// //   try {
-// //
-
-// const { _id } = req.params;
-
-//     const result = await ProductModel.findOne({ _id });
-
-//     return res.status(200).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
-
 // // Rota de produtos favoritos
 // router.post("/product", async (req, res) => {
 //   try {
@@ -260,67 +200,6 @@ init();
 //     const result = await Product.create({ ...req.body });
 
 //     return res.status(201).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
-
-// // GET
-// router.get("/room", isAuthenticated, async (req, res) => {
-//   try {
-//     const result = await Room.find();
-
-//     return res.status(200).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
-
-// router.get("/room/:_id", isAuthenticated, async (req, res) => {
-//   try {
-//     const { _id } = req.params;
-
-//     const result = await Room.findOne({ _id })
-//       .populate("reviews") // carregar todos os objetos de review no lugar de somente os ids
-//       .populate("ownerId", "-passwordHash"); // carregar todos os dados de usuário no lugar de somente o id, porém não enviar a senha
-
-//     return res.status(200).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
-
-// router.patch("/room/:_id", isAuthenticated, async (req, res) => {
-//   try {
-//     const { _id } = req.params;
-
-//     const result = await Room.findOneAndUpdate(
-//       { _id },
-//       { $set: req.body },
-//       { new: true, runValidators: true }
-//     );
-
-//     return res.status(200).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
-
-// router.delete("/room/:_id", isAuthenticated, async (req, res) => {
-//   try {
-//     const { _id } = req.params;
-
-//     // Deleta a acomodação
-//     const result = await Room.findOneAndDelete({ _id }, { new: true });
-
-//     // Deleta todos os reviews dessa acomodação
-//     await Review.deleteMany({ roomId: _id });
-
-//     return res.status(200).json({});
 //   } catch (err) {
 //     console.error(err);
 //     return res.status(500).json({ msg: "Internal server error." });
@@ -366,48 +245,11 @@ router.get("/product/:_id", async (req, res) => {
 
 module.exports = router;
 
-//GET - find
-router.get("/products", async (req, res) => {
-  try {
-    let { page, limit } = req.query;
+// //post inserindo
 
-    page = Number(page) || 0;
-    limit = Number(limit) || 20;
+// // router.?("/",  isAuthenticaded , async (req, res) => {
+// //   const {_id} =  req.params;
 
-    const result = await ProductModel.find()
-      .skip(page * limit)
-      .limit(limit);
+// //   const favoriteProduct = await UserModel.//push()
 
-    return res.status(200).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Internal server error." });
-  }
-});
-
-//GET - findOne
-router.get("/product/:_id", async (req, res) => {
-  try {
-    const { _id } = req.params;
-
-    const product = await ProductModel.findOne({ _id });
-
-    if (!product) {
-      return res.status(404).json({ msg: "Product not found!" });
-    }
-
-    return res.status(200).json(product);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "failed to find product." });
-  }
-});
-
-//post inserindo
-
-// router.?("/",  isAuthenticaded , async (req, res) => {
-//   const {_id} =  req.params;
-
-//   const favoriteProduct = await UserModel.//push()
-
-//rota do ranking-> maior para o menorr;
+// //rota do ranking-> maior para o menorr;
