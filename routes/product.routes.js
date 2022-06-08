@@ -20,7 +20,7 @@ const UserModel = require("../models/User.model");
 // });
 
 //variavel onde vamos colocar todas as nossas categorias de produtos
-let productsCategories = ["toner", "vitamin C"];
+let productsCategories = ["toner"];
 //chamando a nossa função que se conecta com a api e passando o parametro de busca (que é cada categoria das nossa lista de categorias) => será o nosso searchParam da função "connectSearchApiSephora"
 async function exec(category) {
   const categoryResList = await connectSearchApiSephora(category);
@@ -35,13 +35,21 @@ async function exec(category) {
     const categoryResReviews = await connectReviewsApiSephora(
       categoryRes.productId_sephora
     );
+    let productReviews = [];
+    for (result of categoryResReviews.Results) {
+      productReviews.push(mapper_reviews(result));
+    }
+    // console.log("productReviews", productReviews);
 
     let productDetails = mapper_details_reviews(
       categoryRes,
       categoryResDetails,
-      categoryResReviews
+      productReviews
     ); // passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
     console.log("MUNDO MARAVILHOSO E LINDO", productDetails);
+
+    const resultForBD = await ProductModel.create({ ...productDetails });
+    console.log(resultForBD);
   }
 }
 // async function execRev(category) {
@@ -130,7 +138,7 @@ function connectReviewsApiSephora(ProductId) {
       console.error(error);
     });
 }
-// let testId = "P454378";
+
 // console.log(connectReviewsApiSephora(testId));
 
 // const toner = connectApiSephora("Toner");
@@ -175,18 +183,18 @@ function mapper_details_reviews(obj_search, obj_details, obj_reviews) {
     longDescription: obj_details.longDescription,
     howToUse: obj_details.suggestedUsage,
     ingredients: obj_details.currentSku.ingredientDesc,
-    reviews: obj_reviews,
+    sephoraReviews: obj_reviews,
   };
 }
 
-// function mapper_reviews(obj_reviews) {
-//   return {
-//     UserNickname: obj_reviews.UserNickname,
-//     Rating: obj_reviews.Rating,
-//     ReviewText: obj_reviews.ReviewText,
-//     ProductId: obj_reviews.ProductId,
-//   };
-// }
+function mapper_reviews(obj_reviews) {
+  return {
+    UserNickname: obj_reviews.UserNickname,
+    Rating: obj_reviews.Rating,
+    ReviewText: obj_reviews.ReviewText,
+    ProductId: obj_reviews.ProductId,
+  };
+}
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
 
 init();
