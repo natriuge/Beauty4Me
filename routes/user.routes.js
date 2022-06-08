@@ -10,7 +10,7 @@ const salt_rounds = 10;
 
 // Crud (CREATE) - HTTP POST
 // Criar um novo usuário
-router.post("/signup", isAuthenticated, async (req, res) => {
+router.post("/signup", async (req, res) => {
   // Requisições do tipo POST tem uma propriedade especial chamada body, que carrega a informação enviada pelo cliente
   console.log(req.body);
 

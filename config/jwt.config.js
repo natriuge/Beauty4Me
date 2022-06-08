@@ -8,7 +8,7 @@ module.exports = function generateToken(user) {
   const signature = process.env.TOKEN_SIGN_SECRET;
   const expiration = "6h";
 
-  return jwt.sign({ _id, name, email, role }, signature, {
+  return jwt.sign({ _id, name, email }, signature, {
     expiresIn: expiration,
   });
 };

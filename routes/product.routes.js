@@ -56,10 +56,10 @@ async function exec(category) {
       categoryResDetails,
       productReviews
     ); // passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
-    console.log("MUNDO MARAVILHOSO E LINDO", productDetails);
+    // console.log("MUNDO MARAVILHOSO E LINDO", productDetails);
 
-    const resultForBD = await ProductModel.create({ ...productDetails });
-    console.log(resultForBD);
+    // const resultForBD = await ProductModel.create({ ...productDetails });
+    // console.log(resultForBD);
   }
 }
 // async function execRev(category) {
