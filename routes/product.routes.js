@@ -29,7 +29,7 @@ let productsCategories = [
 "vitamin C",
 "mandelic acid",
 "eye cream",
-"mask",
+"mask"
 ];
 //chamando a nossa função que se conecta com a api e passando o parametro de busca (que é cada categoria das nossa lista de categorias) => será o nosso searchParam da função "connectSearchApiSephora"
 async function exec(category) {
@@ -329,54 +329,49 @@ init();
 
 module.exports = router;
 
-// //POST - create
-// router.post("/product", async (req, res) => {
-//   try {
-//     const data = req.body;
-//     const result = await ProductModel.create({ ...data });
+//GET - find
+router.get("/products", async (req, res) => {
+  try {
+    let { page, limit } = req.query;
 
-//     return res.status(201).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
+    page = Number(page) || 0;
+    limit = Number(limit) || 20;
 
-// //GET - find
-// router.get("/product", async (req, res) => {
-//   try {
-//     let { page, limit } = req.query;
+    const result = await ProductModel.find()
+      .skip(page * limit)
+      .limit(limit);
 
-//     const { _id } = req.user;
+    return res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Internal server error." });
+  }
+});
 
-//     page = Number(page) || 0;
-//     limit = Number(limit) || 20;
+//GET - findOne
+router.get("/product/:_id", async (req, res) => {
+  try {
+    const { _id } = req.params;
 
-//     const result = await ProductModel.find()
-//       .skip(page * limit)
-//       .limit(limit);
+    const product = await ProductModel.findOne({ _id });
 
-//     return res.status(200).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
+    if (!product) {
+      return res.status(404).json({ msg: "Product not found!" });
+    }
 
-// //GET - findOne
-// router.get("/product/:_id", async (req, res) => {
-//   try {
-//     const { _id } = req.params;
+    return res.status(200).json(product);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "failed to find product." });
+  }
+});
 
-//     const product = await ProductModel.findOne({ _id });
+//post inserindo 
 
-//     if (!product) {
-//       return res.status(404).json({ msg: "Product not found!" });
-//     }
 
-//     return res.status(200).json(product);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "failed to find product." });
-//   }
-// });
+// router.?("/",  isAuthenticaded , async (req, res) => {
+//   const {_id} =  req.params;
+
+//   const favoriteProduct = await UserModel.//push() 
+
+  //rota do ranking-> maior para o menorr; 
