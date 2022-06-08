@@ -42,12 +42,6 @@ async function exec(category) {
       categoryRes.productId_sephora, // buscando na categoria o id de cada produto dessa categoria
       categoryRes.preferedSku // buscando na categoria o preferedsku
     );
-  }
-}
-
-async function execRev(category) {
-  const categoryResList = await connectSearchApiSephora(category);
-  for (categoryRes of categoryResList) {
     const categoryResReviews = await connectReviewsApiSephora(
       categoryRes.productId_sephora
     );
@@ -62,17 +56,30 @@ async function execRev(category) {
       categoryResDetails,
       productReviews
     ); // passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
-    console.log("MUNDO MARAVILHOSO E LINDO", productDetails);
+    // console.log("MUNDO MARAVILHOSO E LINDO", productDetails);
 
-    const resultForBD = await ProductModel.create({ ...productDetails });
-    console.log(resultForBD);
+    // const resultForBD = await ProductModel.create({ ...productDetails });
+    // console.log(resultForBD);
   }
 }
+// async function execRev(category) {
+//   const categoryResList = await connectSearchApiSephora(category);
+//   for (categoryRes of categoryResList) {
+//     const categoryResReviews = await connectReviewsApiSephora(
+//       categoryRes.productId_sephora
+//     );
+
+//     let productReviews = categoryResReviews.Results.map((elem) =>
+//       mapper_reviews(elem)
+//     );
+//     console.log(productReviews);
+//   }
+// }
 
 //essa função de init faz um loop na nossa array de categorias passando por cada uma;
 async function init() {
   for (let category of productsCategories) {
-    let result = await exec(category);
+    await exec(category);
   }
 }
 // async function init2() {
