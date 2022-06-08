@@ -32,6 +32,15 @@ async function exec(category) {
       categoryRes.productId_sephora, // buscando na categoria o id de cada produto dessa categoria
       categoryRes.preferedSku // buscando na categoria o preferedsku
     );
+<<<<<<< HEAD
+=======
+  }
+}
+
+async function execRev(category) {
+  const categoryResList = await connectSearchApiSephora(category);
+  for (categoryRes of categoryResList) {
+>>>>>>> 8f7f8adfe3c6fae001cc581b90b8f8106705e4ee
     const categoryResReviews = await connectReviewsApiSephora(
       categoryRes.productId_sephora
     );
@@ -69,7 +78,11 @@ async function exec(category) {
 //essa função de init faz um loop na nossa array de categorias passando por cada uma;
 async function init() {
   for (let category of productsCategories) {
+<<<<<<< HEAD
     await exec(category);
+=======
+    let result = await exec(category);
+>>>>>>> 8f7f8adfe3c6fae001cc581b90b8f8106705e4ee
   }
 }
 // async function init2() {
@@ -243,18 +256,18 @@ init();
 // });
 
 // // Rota de produtos favoritos
-// router.post("/product", isAuthenticated, async (req, res) => {
-//   try {
-//     // Extraindo o id do usuário logado
-//     const { _id } = req.user;
-//     const result = await Product.create({ ...req.body, ownerId: _id });
+router.post("/product", async (req, res) => {
+  try {
+    // Extraindo o id do usuário logado
 
-//     return res.status(201).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
+    const result = await Product.create({ ...req.body });
+
+    return res.status(201).json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Internal server error." });
+  }
+});
 
 // // GET
 // router.get("/room", isAuthenticated, async (req, res) => {

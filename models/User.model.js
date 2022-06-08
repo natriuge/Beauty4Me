@@ -15,10 +15,9 @@ const UserSchema = new Schema({
     enum: ["Normal", "Dry", "Oily", "Combination"],
   },
   favoriteProducts: [{ type: Types.ObjectId, ref: "Product" }],
-  reviews: [{ type: Types.ObjectId, ref: "Review" }],
+  allUserReviews: [{ type: Types.ObjectId, ref: "Review" }],
 });
 
 const UserModel = model("User", UserSchema);
 
 module.exports = UserModel;
-
