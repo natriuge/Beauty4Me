@@ -8,9 +8,10 @@ const UserModel = require("../models/User.model");
 // Rota de produtos sem auth
 // router.post("/products", async (req, res) => {
 //   try {
-//     const data = req.body;
+//     const data = productDetails;
 //     const result = await ProductModel.create({ ...data });
 
+//     return res.status(500).json({ msg: "Internal server error." });
 //     return res.status(201).json(result);
 //   } catch (err) {
 //     console.error(err);
@@ -19,7 +20,7 @@ const UserModel = require("../models/User.model");
 // });
 
 //variavel onde vamos colocar todas as nossas categorias de produtos
-let productsCategories = ["toner", "vitamin C"];
+let productsCategories = ["toner"];
 //chamando a nossa função que se conecta com a api e passando o parametro de busca (que é cada categoria das nossa lista de categorias) => será o nosso searchParam da função "connectSearchApiSephora"
 async function exec(category) {
   const categoryResList = await connectSearchApiSephora(category);
@@ -31,23 +32,39 @@ async function exec(category) {
       categoryRes.productId_sephora, // buscando na categoria o id de cada produto dessa categoria
       categoryRes.preferedSku // buscando na categoria o preferedsku
     );
-
-    let productDetails = mapper_details(categoryRes, categoryResDetails); // passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
-    // console.log("teste da api", RESPOSTA);
-  }
-}
-async function execRev(category) {
-  const categoryResList = await connectSearchApiSephora(category);
-  for (categoryRes of categoryResList) {
     const categoryResReviews = await connectReviewsApiSephora(
       categoryRes.productId_sephora
     );
-    //BUG FIXED!
-    let productReviews = categoryResReviews.Results.map((elem) =>
-      mapper_reviews(elem)
-    );
+    let productReviews = [];
+    for (result of categoryResReviews.Results) {
+      productReviews.push(mapper_reviews(result));
+    }
+    // console.log("productReviews", productReviews);
+
+    let productDetails = mapper_details_reviews(
+      categoryRes,
+      categoryResDetails,
+      productReviews
+    ); // passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
+    console.log("MUNDO MARAVILHOSO E LINDO", productDetails);
+
+    const resultForBD = await ProductModel.create({ ...productDetails });
+    console.log(resultForBD);
   }
 }
+// async function execRev(category) {
+//   const categoryResList = await connectSearchApiSephora(category);
+//   for (categoryRes of categoryResList) {
+//     const categoryResReviews = await connectReviewsApiSephora(
+//       categoryRes.productId_sephora
+//     );
+
+//     let productReviews = categoryResReviews.Results.map((elem) =>
+//       mapper_reviews(elem)
+//     );
+//     console.log(productReviews);
+//   }
+// }
 
 //essa função de init faz um loop na nossa array de categorias passando por cada uma;
 async function init() {
@@ -55,11 +72,11 @@ async function init() {
     await exec(category);
   }
 }
-async function init2() {
-  for (let category of productsCategories) {
-    await execRev(category);
-  }
-}
+// async function init2() {
+//   for (let category of productsCategories) {
+//     await execRev(category);
+//   }
+// }
 //configuração para conexão com a rota search da api da Sephora
 async function connectSearchApiSephora(searchParam) {
   try {
@@ -121,7 +138,7 @@ function connectReviewsApiSephora(ProductId) {
       console.error(error);
     });
 }
-// let testId = "P454378";
+
 // console.log(connectReviewsApiSephora(testId));
 
 // const toner = connectApiSephora("Toner");
@@ -152,20 +169,21 @@ function mapper_search_allTypes_products(obj_search) {
     ingredients: "",
     rating: Number(Number(obj_search.rating).toFixed(2)),
     averagePrice: obj_search.currentSku.listPrice,
-    productSkinType: "oil",
+    productSkinType: "oil", //categoryTranslation do skin type !!!!!! TO DO
     category: getCategoryTranslation(obj_search.displayName),
     productId_sephora: obj_search.productId,
     preferedSku: obj_search.currentSku.skuId,
   };
 }
 //fução mapper da rota de detalhes do produto;
-function mapper_details(obj_search, obj_details) {
+function mapper_details_reviews(obj_search, obj_details, obj_reviews) {
   return {
     ...obj_search, //retornando o nosso obj da rota search e acrescentando também os detalhes que estavam em outra rota(rota de details).
     shortDescription: obj_details.shortDescription,
     longDescription: obj_details.longDescription,
     howToUse: obj_details.suggestedUsage,
     ingredients: obj_details.currentSku.ingredientDesc,
+    sephoraReviews: obj_reviews,
   };
 }
 
@@ -180,7 +198,7 @@ function mapper_reviews(obj_reviews) {
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
 
 init();
-init2();
+// init2();
 
 //ROTAS DO PRODUTO:
 
