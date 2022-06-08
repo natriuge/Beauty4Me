@@ -6,57 +6,87 @@ const ReviewModel = require("../models/Review.model");
 const UserModel = require("../models/User.model");
 
 // Rota de produtos sem auth
-// // router.post("/product", async (req, res) => {
-// //   try {
-// //     const data = req.body;
-// //     const result = await ProductModel.create({ ...data });
+// router.post("/products", async (req, res) => {
+//   try {
+//     const data = productDetails;
+//     const result = await ProductModel.create({ ...data });
 
-// //     return res.status(201).json(result);
-// //   } catch (err) {
-// //     console.error(err);
-// //     return res.status(500).json({ msg: "Internal server error." });
-// //   }
-// //
+//     return res.status(500).json({ msg: "Internal server error." });
+//     return res.status(201).json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
 // });
 
 //variavel onde vamos colocar todas as nossas categorias de produtos
-let productsCategories = ["toner", "vitamin C"];
+let productsCategories = [
+"cleanser",
+"moisturizing", 
+"hyaluronic acid", 
+"niacinamide acid",
+"glycolic acid",
+"vitamin C",
+"mandelic acid",
+"eye cream",
+"mask",
+];
 //chamando a nossa função que se conecta com a api e passando o parametro de busca (que é cada categoria das nossa lista de categorias) => será o nosso searchParam da função "connectSearchApiSephora"
 async function exec(category) {
- 
-  const categoryResList = await connectSearchApiSephora(category); //category é o params de pesquisa da connectSearchApiSephora
+  const categoryResList = await connectSearchApiSephora(category);
+  //category é o params de pesquisa da connectSearchApiSephora
   for (categoryRes of categoryResList) {
+    //categoryRes é um objeto individual
+    //categoryResList é o conjunto de objetos
     const categoryResDetails = await connectDetailsApiSephora(
       categoryRes.productId_sephora, // buscando na categoria o id de cada produto dessa categoria
       categoryRes.preferedSku // buscando na categoria o preferedsku
     );
-    let RESPOSTA= mapper_details(categoryRes, categoryResDetails);// passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
+    const categoryResReviews = await connectReviewsApiSephora(
+      categoryRes.productId_sephora
+    );
+    let productReviews = [];
+    for (result of categoryResReviews.Results) {
+      productReviews.push(mapper_reviews(result));
+    }
+    // console.log("productReviews", productReviews);
 
-    console.log("teste da api", RESPOSTA);
+    let productDetails = mapper_details_reviews(
+      categoryRes,
+      categoryResDetails,
+      productReviews
+    ); // passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
+    console.log("MUNDO MARAVILHOSO E LINDO", productDetails);
+
+    const resultForBD = await ProductModel.create({ ...productDetails });
+    console.log(resultForBD);
   }
-} 
+}
+// async function execRev(category) {
+//   const categoryResList = await connectSearchApiSephora(category);
+//   for (categoryRes of categoryResList) {
+//     const categoryResReviews = await connectReviewsApiSephora(
+//       categoryRes.productId_sephora
+//     );
 
-
-async function execRev(category) {
-  const categoryResList = await connectSearchApiSephora(category); 
-  for (categoryRes of categoryResList) {
-    const categoryResReviews = await connectReviewsApiSephora(categoryRes.productId_sephora);
-    let responseb = mapper_reviews(categoryResReviews);
-    // console.log("response", responseb)
-  }
-} 
+//     let productReviews = categoryResReviews.Results.map((elem) =>
+//       mapper_reviews(elem)
+//     );
+//     console.log(productReviews);
+//   }
+// }
 
 //essa função de init faz um loop na nossa array de categorias passando por cada uma;
 async function init() {
   for (let category of productsCategories) {
-   let result = await exec(category);
+    await exec(category);
   }
 }
-async function init2() {
-  for (let category of productsCategories) {
-    await execRev(category);
-  }
-}
+// async function init2() {
+//   for (let category of productsCategories) {
+//     await execRev(category);
+//   }
+// }
 //configuração para conexão com a rota search da api da Sephora
 async function connectSearchApiSephora(searchParam) {
   try {
@@ -64,16 +94,16 @@ async function connectSearchApiSephora(searchParam) {
       method: "GET",
       url: "https://sephora.p.rapidapi.com/products/search",
       //params: "chave" de busca dinâmica;
-      params: { q: searchParam, pageSize: "60", currentPage: "1" },
+      params: { q: searchParam, pageSize: "5", currentPage: "1" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": process.env.X_RapidAPI_Key,
+        "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
       },
     }); //variavel que pega os produtos retornados na response
-    let productList = [...response.data.products]
+    let productList = [...response.data.products];
     //cada produto sendo iterado e retornado "bonitinho" através da função mapper que trás apenas os dados que precisamos pro proj;
     return productList.map((product) =>
-      mapper_search_allTypes_products(product) 
+      mapper_search_allTypes_products(product)
     );
   } catch (error) {
     console.error(error);
@@ -89,7 +119,7 @@ function connectDetailsApiSephora(productId, preferedSku) {
       params: { productId: productId, preferedSku: preferedSku },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": process.env.X_RapidAPI_Key,
+        "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
       },
     })
     .then(function (response) {
@@ -105,10 +135,10 @@ function connectReviewsApiSephora(ProductId) {
     .request({
       method: "GET",
       url: "https://sephora.p.rapidapi.com/reviews/list",
-      params: { ProductId: ProductId, Limit: "60", Offset: "0" },
+      params: { ProductId: ProductId, Limit: "5", Offset: "0" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
-        "X-RapidAPI-Key": process.env.X_RapidAPI_Key,
+        "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
       },
     })
     .then(function (response) {
@@ -117,8 +147,8 @@ function connectReviewsApiSephora(ProductId) {
     .catch(function (error) {
       console.error(error);
     });
-}    
-// let testId = "P454378";
+}
+
 // console.log(connectReviewsApiSephora(testId));
 
 // const toner = connectApiSephora("Toner");
@@ -149,44 +179,43 @@ function mapper_search_allTypes_products(obj_search) {
     ingredients: "",
     rating: Number(Number(obj_search.rating).toFixed(2)),
     averagePrice: obj_search.currentSku.listPrice,
-    productSkinType: "oil", 
+    productSkinType: "oil", //categoryTranslation do skin type !!!!!! TO DO
     category: getCategoryTranslation(obj_search.displayName),
     productId_sephora: obj_search.productId,
     preferedSku: obj_search.currentSku.skuId,
   };
 }
-//fução mapper da rota de detalhes do produto; 
-function mapper_details(obj_search, obj_details) {
+//fução mapper da rota de detalhes do produto;
+function mapper_details_reviews(obj_search, obj_details, obj_reviews) {
   return {
     ...obj_search, //retornando o nosso obj da rota search e acrescentando também os detalhes que estavam em outra rota(rota de details).
     shortDescription: obj_details.shortDescription,
     longDescription: obj_details.longDescription,
     howToUse: obj_details.suggestedUsage,
     ingredients: obj_details.currentSku.ingredientDesc,
+    sephoraReviews: obj_reviews,
   };
 }
 
-function mapper_reviews(obj_reviews){
+function mapper_reviews(obj_reviews) {
   return {
-  
     UserNickname: obj_reviews.UserNickname,
     Rating: obj_reviews.Rating,
     ReviewText: obj_reviews.ReviewText,
-    ProductId_sephora: obj_reviews.ProductId,
+    ProductId: obj_reviews.ProductId,
   };
 }
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
 
 init();
-init2()
+// init2();
 
 //ROTAS DO PRODUTO:
 
-
 //1. POST.CREATE (rota que vai postar no nosso banco de dados o valor que vem da api da Sephora),
-//2. GET.SEARCH (rota que pega os produtos que foram postados no nosso banco de dados, que são a reposta vinda da api da sephora), 
+//2. GET.SEARCH (rota que pega os produtos que foram postados no nosso banco de dados, que são a reposta vinda da api da sephora),
 //3. GET.FINDONE e GET.FINDMANY (rotas de pesquisa do ranking),
-//4. 
+//4.
 
 // router.get("/product/search", async (req, res) => {
 //   try {
@@ -224,18 +253,18 @@ init2()
 // });
 
 // // Rota de produtos favoritos
-router.post("/product",  async (req, res) => {
-  try {
-    // Extraindo o id do usuário logado
-  
-    const result = await Product.create({ ...req.body });
+// router.post("/product", isAuthenticated, async (req, res) => {
+//   try {
+//     // Extraindo o id do usuário logado
+//     const { _id } = req.user;
+//     const result = await Product.create({ ...req.body, ownerId: _id });
 
-    return res.status(201).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Internal server error." });
-  }
-});
+//     return res.status(201).json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
+// });
 
 // // GET
 // router.get("/room", isAuthenticated, async (req, res) => {
@@ -299,3 +328,55 @@ router.post("/product",  async (req, res) => {
 // });
 
 module.exports = router;
+
+// //POST - create
+// router.post("/product", async (req, res) => {
+//   try {
+//     const data = req.body;
+//     const result = await ProductModel.create({ ...data });
+
+//     return res.status(201).json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
+// });
+
+// //GET - find
+// router.get("/product", async (req, res) => {
+//   try {
+//     let { page, limit } = req.query;
+
+//     const { _id } = req.user;
+
+//     page = Number(page) || 0;
+//     limit = Number(limit) || 20;
+
+//     const result = await ProductModel.find()
+//       .skip(page * limit)
+//       .limit(limit);
+
+//     return res.status(200).json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
+// });
+
+// //GET - findOne
+// router.get("/product/:_id", async (req, res) => {
+//   try {
+//     const { _id } = req.params;
+
+//     const product = await ProductModel.findOne({ _id });
+
+//     if (!product) {
+//       return res.status(404).json({ msg: "Product not found!" });
+//     }
+
+//     return res.status(200).json(product);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "failed to find product." });
+//   }
+// });
