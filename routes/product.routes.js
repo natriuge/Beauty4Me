@@ -21,15 +21,15 @@ const UserModel = require("../models/User.model");
 
 //variavel onde vamos colocar todas as nossas categorias de produtos
 let productsCategories = [
-"cleanser",
-"moisturizing", 
-"hyaluronic acid", 
-"niacinamide acid",
-"glycolic acid",
-"vitamin C",
-"mandelic acid",
-"eye cream",
-"mask"
+  "cleanser",
+  "moisturizing",
+  "hyaluronic acid",
+  "niacinamide acid",
+  "glycolic acid",
+  "vitamin C",
+  "mandelic acid",
+  "eye cream",
+  "mask",
 ];
 //chamando a nossa função que se conecta com a api e passando o parametro de busca (que é cada categoria das nossa lista de categorias) => será o nosso searchParam da função "connectSearchApiSephora"
 async function exec(category) {
@@ -366,12 +366,11 @@ router.get("/product/:_id", async (req, res) => {
   }
 });
 
-//post inserindo 
-
+//post inserindo
 
 // router.?("/",  isAuthenticaded , async (req, res) => {
 //   const {_id} =  req.params;
 
-//   const favoriteProduct = await UserModel.//push() 
+//   const favoriteProduct = await UserModel.//push()
 
-  //rota do ranking-> maior para o menorr; 
+//rota do ranking-> maior para o menorr;
