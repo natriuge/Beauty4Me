@@ -104,6 +104,8 @@ router.get("/profile", isAuthenticated, attachCurrentUser, (req, res) => {
     const loggedInUser = req.currentUser;
 
     if (loggedInUser) {
+      // const result = await UserModel.findOne({loggedInUser}).populate("favorites")
+
       // Responder o cliente com os dados do usuário. O status 200 significa OK
       return res.status(200).json(loggedInUser);
     } else {

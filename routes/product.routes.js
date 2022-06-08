@@ -327,6 +327,43 @@ init();
 //   }
 // });
 
+//GET - find
+router.get("/products", async (req, res) => {
+  try {
+    let { page, limit } = req.query;
+
+    page = Number(page) || 0;
+    limit = Number(limit) || 20;
+
+    const result = await ProductModel.find()
+      .skip(page * limit)
+      .limit(limit);
+
+    return res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Internal server error." });
+  }
+});
+
+//GET - findOne
+router.get("/product/:_id", async (req, res) => {
+  try {
+    const { _id } = req.params;
+
+    const product = await ProductModel.findOne({ _id });
+
+    if (!product) {
+      return res.status(404).json({ msg: "Product not found!" });
+    }
+
+    return res.status(200).json(product);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "failed to find product." });
+  }
+});
+
 module.exports = router;
 
 //GET - find
