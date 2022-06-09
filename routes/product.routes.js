@@ -7,8 +7,10 @@ const ProductModel = require("../models/Product.model");
 const ReviewModel = require("../models/Review.model");
 const UserModel = require("../models/User.model");
 
+
 const isAuthenticated = require("../middlewares/isAuthenticated");
 //variavel onde vamos colocar todas as nossas categorias de produtos
+
 // let productsCategories = [
 //   "cleanser",
 //   "moisturizing",
@@ -61,6 +63,7 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 
 // //configuração para conexão com a rota search da api da Sephora
 // async function connectSearchApiSephora(searchParam) {
+
 //   try {
 //     const response = await axios.request({
 //       method: "GET",
@@ -178,6 +181,7 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 // init();
 
 //GET - find
+
 router.get("/products", async (req, res) => {
   try {
     let { page, limit } = req.query;
@@ -187,7 +191,8 @@ router.get("/products", async (req, res) => {
 
     const result = await ProductModel.find()
       .skip(page * limit)
-      .limit(limit);
+      .limit(limit)
+      .sort({ rating: -1 });
 
     return res.status(200).json(result);
   } catch (err) {
@@ -201,7 +206,9 @@ router.get("/product/:_id", async (req, res) => {
   try {
     const { _id } = req.params;
 
-    const product = await ProductModel.findOne({ _id });
+    const product = await ProductModel.findOne({ _id })
+      .populate("allProductReviews", "-authorId productId")
+      .populate("favoritedBy");
 
     if (!product) {
       return res.status(404).json({ msg: "Product not found!" });
