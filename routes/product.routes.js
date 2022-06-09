@@ -241,3 +241,4 @@ router.patch("/product/:productId", isAuthenticated, async (req, res) => {
 });
 
 module.exports = router;
+//comentário teste
