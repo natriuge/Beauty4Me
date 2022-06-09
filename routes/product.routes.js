@@ -376,6 +376,7 @@ router.get("/product/:_id", async (req, res) => {
   }
 });
 
+
 //rota de favoritar (produto)
 router.post("/product/:productId", isAuthenticated, async (req, res) => {
   try {
@@ -397,17 +398,24 @@ router.post("/product/:productId", isAuthenticated, async (req, res) => {
         }
       }
     );
-
-    
-
     return res.status(201).json(result);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ msg: "Internal server error." });
   }
 });
-
 module.exports = router;
+
+
+
+//post inserindo
+
+// router.?("/",  isAuthenticaded , async (req, res) => {
+//   const {_id} =  req.params;
+
+//   const favoriteProduct = await UserModel.//push()
+
+//rota do ranking-> maior para o menorr;
 
 // //post inserindo
 
