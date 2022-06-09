@@ -177,38 +177,6 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 
 // init();
 
-//ROTAS DO PRODUTO:
-
-//1. POST.CREATE (rota que vai postar no nosso banco de dados o valor que vem da api da Sephora),
-//2. GET.SEARCH (rota que pega os produtos que foram postados no nosso banco de dados, que são a reposta vinda da api da sephora),
-//3. GET.FINDONE e GET.FINDMANY (rotas de pesquisa do ranking),
-//4.
-
-// router.get("/product/search", async (req, res) => {
-//   try {
-//     const result = await ProductModel.findOne({ _id });
-
-//     return res.status(200).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
-
-// // Rota de produtos favoritos
-// router.post("/product", async (req, res) => {
-//   try {
-//     // Extraindo o id do usuário logado
-
-//     const result = await Product.create({ ...req.body });
-
-//     return res.status(201).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
-
 //GET - find
 router.get("/products", async (req, res) => {
   try {
@@ -247,17 +215,15 @@ router.get("/product/:_id", async (req, res) => {
 });
 
 //rota de favoritar (produto)
-router.post("/product/:productId", isAuthenticated, async (req, res) => {
+router.patch("/product/:productId", isAuthenticated, async (req, res) => {
   try {
     const { _id } = req.user;
 
     const { productId } = req.params;
 
-    // const result = await ReviewModel.create({ ...req.body, authorId: _id });
     const result = await ProductModel.findOne({
       _id: ObjectId(productId),
     });
- 
 
     await UserModel.updateOne(
       { _id },
@@ -267,9 +233,6 @@ router.post("/product/:productId", isAuthenticated, async (req, res) => {
         }
       }
     );
-
-    
-
     return res.status(201).json(result);
   } catch (err) {
     console.error(err);
@@ -278,12 +241,3 @@ router.post("/product/:productId", isAuthenticated, async (req, res) => {
 });
 
 module.exports = router;
-
-// //post inserindo
-
-// // router.?("/",  isAuthenticaded , async (req, res) => {
-// //   const {_id} =  req.params;
-
-// //   const favoriteProduct = await UserModel.//push()
-
-// //rota do ranking-> maior para o menorr;
