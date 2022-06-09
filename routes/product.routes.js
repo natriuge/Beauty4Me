@@ -205,7 +205,7 @@ router.get("/product/search", async (req, res) => {
   }
 });
 
-//GET - find
+//GET - find (ranking)
 router.get("/products", async (req, res) => {
   try {
     let { page, limit } = req.query;
@@ -215,7 +215,8 @@ router.get("/products", async (req, res) => {
 
     const result = await ProductModel.find()
       .skip(page * limit)
-      .limit(limit);
+      .limit(limit)
+      .sort({ rating: -1 });
 
     return res.status(200).json(result);
   } catch (err) {
@@ -229,7 +230,9 @@ router.get("/product/:_id", async (req, res) => {
   try {
     const { _id } = req.params;
 
-    const product = await ProductModel.findOne({ _id });
+    const product = await ProductModel.findOne({ _id })
+      .populate("allProductReviews", "-authorId productId")
+      .populate("favoritedBy");
 
     if (!product) {
       return res.status(404).json({ msg: "Product not found!" });
