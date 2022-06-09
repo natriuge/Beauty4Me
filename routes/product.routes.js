@@ -558,9 +558,6 @@ router.post("/product/:productId", isAuthenticated, async (req, res) => {
         }
       }
     );
-
-    
-
     return res.status(201).json(result);
   } catch (err) {
     console.error(err);
