@@ -231,7 +231,7 @@ router.get("/product/:_id", async (req, res) => {
     const { _id } = req.params;
 
     const product = await ProductModel.findOne({ _id })
-      .populate("allProductReviews", "-authorId")
+      .populate("allProductReviews", "-authorId productId")
       .populate("favoritedBy");
 
     if (!product) {
