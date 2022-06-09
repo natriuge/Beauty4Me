@@ -5,6 +5,7 @@ const ProductModel = require("../models/Product.model");
 const UserModel = require("../models/User.model");
 
 const isAuthenticated = require("../middlewares/isAuthenticated");
+const attachCurrentUser = require("../middlewares/attachCurrentUser");
 
 //rota de criar uma review (post)
 router.post("/review", isAuthenticated, async (req, res) => {
