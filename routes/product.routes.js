@@ -63,7 +63,7 @@ async function connectSearchApiSephora(searchParam) {
       method: "GET",
       url: "https://sephora.p.rapidapi.com/products/search",
       //params: "chave" de busca dinâmica;
-      params: { q: searchParam, pageSize: "5", currentPage: "1" },
+      params: { q: searchParam, pageSize: "2", currentPage: "1" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
         "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
@@ -104,7 +104,7 @@ function connectReviewsApiSephora(ProductId) {
     .request({
       method: "GET",
       url: "https://sephora.p.rapidapi.com/reviews/list",
-      params: { ProductId: ProductId, Limit: "5", Offset: "0" },
+      params: { ProductId: ProductId, Limit: "2", Offset: "0" },
       headers: {
         "X-RapidAPI-Host": "sephora.p.rapidapi.com",
         "X-RapidAPI-Key": process.env.X_RAPIDAPI_KEY,
@@ -119,17 +119,30 @@ function connectReviewsApiSephora(ProductId) {
 }
 
 // SUGESTÃO => arquivo separado os mappers
-function getCategoryTranslation(batata) {
-  if (batata.toLowerCase().indexOf("peel") > -1) {
-    return "peel";
-  } else if (batata.toLowerCase().indexOf("soap") > -1) {
-    return "soap";
-  } else if (batata.toLowerCase().indexOf("moisture") > -1) {
-    return "moisture";
+function getCategoryTranslation(elem) {
+  if (elem.toLowerCase().indexOf("cleanser") > -1) {
+    return "cleanser";
+  } else if (elem.toLowerCase().indexOf("moisturizing") > -1) {
+    return "moisturizing";
+  } else if (elem.toLowerCase().indexOf("hyaluronic acid") > -1) {
+    return "hyaluronic acid";
+  } else if (elem.toLowerCase().indexOf("niacinamide acid") > -1) {
+    return "niacinamide acid";
+  } else if (elem.toLowerCase().indexOf("glycolic acid") > -1) {
+    return "glycolic acid";
+  } else if (elem.toLowerCase().indexOf("vitamin C") > -1) {
+    return "vitamin C";
+  } else if (elem.toLowerCase().indexOf("mandelic acid") > -1) {
+    return "mandelic acid";
+  } else if (elem.toLowerCase().indexOf("eye cream") > -1) {
+    return "eye cream";
+  } else if (elem.toLowerCase().indexOf("mask") > -1) {
+    return "mask";
   } else {
-    return batata;
+    return elem;
   }
 }
+
 // essa é a função que mapeia o objeto que vamos receber, trazendo apenas as informações que queremos utilizar no nosso projeto(infos do produto)
 function mapper_search_allTypes_products(obj_search) {
   return {
@@ -174,37 +187,23 @@ function mapper_reviews(obj_reviews) {
 
 init();
 
-//ROTAS DO PRODUTO:
+// ROTAS DO PRODUTO:
 
-//1. POST.CREATE (rota que vai postar no nosso banco de dados o valor que vem da api da Sephora),
-//2. GET.SEARCH (rota que pega os produtos que foram postados no nosso banco de dados, que são a reposta vinda da api da sephora),
-//3. GET.FINDONE e GET.FINDMANY (rotas de pesquisa do ranking),
-//4.
+// 1. POST.CREATE (rota que vai postar no nosso banco de dados o valor que vem da api da Sephora),
+// 2. GET.SEARCH (rota que pega os produtos que foram postados no nosso banco de dados, que são a reposta vinda da api da sephora),
+// 3. GET.FINDONE e GET.FINDMANY (rotas de pesquisa do ranking),
+// 4.
 
-// router.get("/product/search", async (req, res) => {
-//   try {
-//     const result = await ProductModel.findOne({ _id });
+router.get("/product/search", async (req, res) => {
+  try {
+    const result = await ProductModel.findOne({ _id });
 
-//     return res.status(200).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
-
-// // Rota de produtos favoritos
-// router.post("/product", async (req, res) => {
-//   try {
-//     // Extraindo o id do usuário logado
-
-//     const result = await Product.create({ ...req.body });
-
-//     return res.status(201).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
+    return res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Internal server error." });
+  }
+});
 
 //GET - find
 router.get("/products", async (req, res) => {
