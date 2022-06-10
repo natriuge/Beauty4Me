@@ -39,6 +39,7 @@ async function exec(category) {
       productReviews.push(mapper_reviews(result));
     }
     // console.log("productReviews", productReviews);
+  
 
     let productDetails = mapper_details_reviews(
       categoryRes,
