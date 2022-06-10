@@ -7,6 +7,47 @@ const ProductModel = require("../models/Product.model");
 const ReviewModel = require("../models/Review.model");
 const UserModel = require("../models/User.model");
 
+
+// variavel onde vamos colocar todas as nossas categorias de produtos
+let productsCategories = [
+  "cleanser",
+  "moisturizing",
+  "hyaluronic acid",
+  "niacinamide acid",
+  "glycolic acid",
+  "vitamin C",
+  "mandelic acid",
+  "eye cream",
+  "mask",
+];
+//chamando a nossa função que se conecta com a api e passando o parametro de busca (que é cada categoria das nossa lista de categorias) => será o nosso searchParam da função "connectSearchApiSephora"
+async function exec(category) {
+  const categoryResList = await connectSearchApiSephora(category);
+  //category é o params de pesquisa da connectSearchApiSephora
+  for (categoryRes of categoryResList) {
+    //categoryRes é um objeto individual
+    //categoryResList é o conjunto de objetos
+    const categoryResDetails = await connectDetailsApiSephora(
+      categoryRes.productId_sephora, // buscando na categoria o id de cada produto dessa categoria
+      categoryRes.preferedSku // buscando na categoria o preferedsku
+    );
+    const categoryResReviews = await connectReviewsApiSephora(
+      categoryRes.productId_sephora
+    );
+    let productReviews = [];
+    for (result of categoryResReviews.Results) {
+      productReviews.push(mapper_reviews(result));
+    }
+    // console.log("productReviews", productReviews);
+  
+
+    let productDetails = mapper_details_reviews(
+      categoryRes,
+      categoryResDetails,
+      productReviews
+    ); // passando no nosso mapper dos detalhes esses dois parametros para receber nosso obj "bonitinho" com os detalhes que queremos de cada produto.
+    console.log("MUNDO MARAVILHOSO E LINDO", productDetails);
+
 const isAuthenticated = require("../middlewares/isAuthenticated");
 
 //variavel onde vamos colocar todas as nossas categorias de produtos
