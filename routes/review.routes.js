@@ -59,6 +59,47 @@ router.post("/review", isAuthenticated, attachCurrentUser, async (req, res) => {
 });
 
 //rota de atualizar uma review (patch)
+
+router.patch("/review", isAuthenticated, async (req, res) => {
+  try {
+    const { _id } = req.user;
+
+    const { productId } = req.body;
+
+    const { authorId } = req.body;
+
+    // Verifica se a review que vai ser atualizada é de propriedade do usuário logado
+    const user = await UserModel.findOne({
+      _id,
+      allUserReviews: { $in: [authorId] },
+    });
+
+    console.log(user);
+
+    // Usuários não podem atualizar um review de própria autoria
+    if (user) {
+      const result = await ReviewModel.findOneAndUpdate(
+        { _id, authorId: req.user._id },
+        { $set: data },
+        { new: true, runValidators: true }
+      );
+
+      // Adicionar referência do review criado no modelo da acomodação
+
+      await ProductModel.updateOne(
+        { _id: productId },
+        { $push: { allProductReviews: result._id } }
+      ); // Como não precisamos incluir na resposta o resultado dessa consulta, podemos usar o updateOne que tem a sintaxe mais simples do que o findOneAndUpdate
+
+      // Adicionar referência do review criado no modelo do usuário
+
+      await UserModel.updateOne(
+        { _id },
+        { $push: { allUserReviews: result._id } }
+      );
+
+      return res.status(201).json(result);
+
 router.patch(
   "/review",
   isAuthenticated,
@@ -97,9 +138,16 @@ router.patch(
     } catch (err) {
       console.error(err);
       return res.status(500).json({ msg: "Internal server error." });
+
     }
+
+    // 400: Bad Request
+    return res.status(400).json({ msg: "You cannot update this review" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Internal server error." });
   }
-);
+});
 
 // rota de deletar uma review (delete)
 router.delete(
