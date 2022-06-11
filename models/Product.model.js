@@ -11,13 +11,17 @@ const ProductSchema = new Schema({
   ingredients: { type: String },
   rating: { type: Number },
   averagePrice: { type: String },
-  productSkinType: { type: String },
   category: { type: String },
   sephoraReviews: [],
   productId_sephora: { type: String },
   preferedSku: { type: String },
-  allProductReviews: [{ type: Types.ObjectId, ref: "Review" }],
+  userReviews: [{ type: Types.ObjectId, ref: "Review" }],
   favoritedBy: [{ type: Types.ObjectId, ref: "User" }],
 });
+
+// ProductSchema.index({ productName: "text", shortDescription: "text" }); //todos os campos relevantes
+// //operador text dentro do find para procurar dentro destes todos citados
+
 const ProductModel = model("Product", ProductSchema);
+
 module.exports = ProductModel;

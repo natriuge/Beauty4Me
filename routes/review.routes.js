@@ -41,15 +41,12 @@ router.post("/review", isAuthenticated, attachCurrentUser, async (req, res) => {
 
     await ProductModel.updateOne(
       { _id: productId },
-      { $push: { allProductReviews: result._id } }
+      { $push: { userReviews: result._id } }
     ); // Como não precisamos incluir na resposta o resultado dessa consulta, podemos usar o updateOne que tem a sintaxe mais simples do que o findOneAndUpdate
 
     // Adicionar referência do review criado no modelo do usuário
 
-    await UserModel.updateOne(
-      { _id },
-      { $push: { allUserReviews: result._id } }
-    );
+    await UserModel.updateOne({ _id }, { $push: { userReviews: result._id } });
 
     return res.status(201).json(result);
   } catch (err) {
@@ -124,13 +121,13 @@ router.delete(
         // Deletar a referência do review criado no modelo da acomodação
         await ProductModel.updateOne(
           { _id: result.productId },
-          { $pull: { allProductReviews: reviewId } }
+          { $pull: { userReviews: reviewId } }
         );
 
         // Deletar a referência do review criado no modelo do usuário
         await UserModel.updateOne(
           { _id: userId },
-          { $pull: { allUserReviews: reviewId } }
+          { $pull: { userReviews: reviewId } }
         );
 
         return res.status(201).json(result);
