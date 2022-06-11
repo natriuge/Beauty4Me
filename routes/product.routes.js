@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
 
 const ProductModel = require("../models/Product.model");
-const ReviewModel = require("../models/Review.model");
 const UserModel = require("../models/User.model");
 
 const isAuthenticated = require("../middlewares/isAuthenticated");
@@ -285,6 +284,7 @@ router.patch("/product/:productId", isAuthenticated, async (req, res) => {
   }
 });
 
+
 //GET- Barra de search
 
 router.get("/product-search", async (req, res) => {
@@ -306,5 +306,3 @@ router.get("/product-search", async (req, res) => {
 
 
 module.exports = router;
-
-
