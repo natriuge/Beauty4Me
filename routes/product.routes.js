@@ -201,18 +201,6 @@ init();
 
 //ROTAS DOS PRODUTOS
 
-//get - barra de busca --> Nath vai trabalhart nela (findMany())
-// router.get("/product-search", async (req, res) => {
-//   try {
-//     const result = await ProductModel.findOne({ _id });
-
-//     return res.status(200).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
-
 //GET - find (ranking)
 router.get("/products", async (req, res) => {
   try {
@@ -284,25 +272,20 @@ router.patch("/product/:productId", isAuthenticated, async (req, res) => {
   }
 });
 
-
 //GET- Barra de search
-
 router.get("/product-search", async (req, res) => {
   try {
     const searchString = req.query.q;
-    console.log(searchString.q)
-     console.log(req.query);
-    const result = await ProductModel.find(
-      {
-      $text: { $search: searchString }  
-    }
-    );
+    console.log(searchString.q);
+    console.log(req.query);
+    const result = await ProductModel.find({
+      $text: { $search: searchString },
+    });
     return res.status(201).json(result);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ msg: "product not found" });
   }
 });
-
 
 module.exports = router;
