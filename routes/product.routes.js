@@ -156,19 +156,20 @@ function getCategoryTranslation(elem) {
 // essa é a função que mapeia o objeto que vamos receber, trazendo apenas as informações que queremos utilizar no nosso projeto(infos do produto)
 function mapper_search_allTypes_products(obj_search) {
   return {
-    productName: obj_search.displayName,
-    imageDetails: obj_search.image450,
-    imageIcon: obj_search.image135,
+    productName: (obj_search || {}).displayName || "Not available",
+    imageDetails: (obj_search || {}).image450 || "Not available",
+    imageIcon: (obj_search || {}).image135 || "Not available",
     shortDescription: "",
     longDescription: "",
-    brandName: obj_search.brandName,
+    brandName: (obj_search || {}).brandName || "Not available",
     howToUse: "",
     ingredients: "",
-    rating: Number(Number(obj_search.rating).toFixed(2)),
-    averagePrice: obj_search.currentSku.listPrice,
+    rating: Number(Number(obj_search.rating).toFixed(2)) || "Not available",
+    averagePrice:
+      ((obj_search || {}).currentSku || {}).listPrice || "Not available",
     category: getCategoryTranslation(obj_search.displayName),
-    productId_sephora: obj_search.productId,
-    preferedSku: obj_search.currentSku.skuId,
+    productId_sephora: (obj_search || {}).productId || "Not available",
+    preferedSku: ((obj_search || {}).currentSku || {}).skuId || "Not available",
   };
 }
 
@@ -176,21 +177,21 @@ function mapper_search_allTypes_products(obj_search) {
 function mapper_details_reviews(obj_search, obj_details, obj_reviews) {
   return {
     ...obj_search, //retornando o nosso obj da rota search e acrescentando também os detalhes que estavam em outra rota(rota de details).
-    shortDescription: obj_details.shortDescription,
-    longDescription: obj_details.longDescription,
-    howToUse: obj_details.suggestedUsage,
+    shortDescription: (obj_details || {}).shortDescription || "Not available",
+    longDescription: (obj_details || {}).longDescription || "Not available",
+    howToUse: (obj_details || {}).suggestedUsage || "Not available",
     ingredients:
       ((obj_details || {}).currentSku || {}).ingredientDesc || "Not available",
-    sephoraReviews: obj_reviews,
+    sephoraReviews: obj_reviews || {} || "Not available",
   };
 }
 
 function mapper_reviews(obj_reviews) {
   return {
-    UserNickname: obj_reviews.UserNickname,
-    Rating: obj_reviews.Rating,
-    ReviewText: obj_reviews.ReviewText,
-    ProductId: obj_reviews.ProductId,
+    UserNickname: (obj_reviews || {}).UserNickname || "Not available",
+    Rating: (obj_reviews || {}).Rating || "Not available",
+    ReviewText: (obj_reviews || {}).ReviewText || "Not available",
+    ProductId: (obj_reviews || {}).ProductId || "Not available",
   };
 }
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
