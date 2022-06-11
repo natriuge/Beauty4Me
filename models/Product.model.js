@@ -1,11 +1,11 @@
 const { Schema, Types, model } = require("mongoose");
 
 const ProductSchema = new Schema({
-  productName: { type: String },
+  productName: { type: String }, //vai ser esse
   imageDetails: { type: String },
   imageIcon: { type: String },
-  shortDescription: { type: String },
-  longDescription: { type: String },
+  shortDescription: { type: String }, //esse
+  longDescription: { type: String }, //esse
   brandName: { type: String },
   howToUse: { type: String },
   ingredients: { type: String },
@@ -18,9 +18,7 @@ const ProductSchema = new Schema({
   userReviews: [{ type: Types.ObjectId, ref: "Review" }],
   favoritedBy: [{ type: Types.ObjectId, ref: "User" }],
 });
-
-// ProductSchema.index({ productName: "text", shortDescription: "text" }); //todos os campos relevantes
-// //operador text dentro do find para procurar dentro destes todos citados
+ProductSchema.index({ productName: "text", shortDescription: "text", longDescription: "text" });
 
 const ProductModel = model("Product", ProductSchema);
 

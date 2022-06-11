@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const axios = require("axios");
+const { text } = require("express");
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
 
@@ -282,5 +283,26 @@ router.patch("/product/:productId", isAuthenticated, async (req, res) => {
     return res.status(500).json({ msg: "Internal server error." });
   }
 });
+
+
+//GET- Barra de search
+
+router.get("/product-search", async (req, res) => {
+  try {
+    const searchString = req.query.q;
+    console.log(searchString.q)
+     console.log(req.query);
+    const result = await ProductModel.find(
+      {
+      $text: { $search: searchString }  
+    }
+    );
+    return res.status(201).json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "product not found" });
+  }
+});
+
 
 module.exports = router;
