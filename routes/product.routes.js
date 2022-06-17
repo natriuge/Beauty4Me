@@ -197,22 +197,14 @@ function mapper_reviews(obj_reviews) {
 }
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
 
-init();
+// init();
 
 //ROTAS DOS PRODUTOS
 
 //GET - find (ranking)
 router.get("/products", async (req, res) => {
   try {
-    let { page, limit } = req.query;
-
-    page = Number(page) || 0;
-    limit = Number(limit) || 20;
-
-    const result = await ProductModel.find()
-      .skip(page * limit)
-      .limit(limit)
-      .sort({ rating: -1 });
+    const result = await ProductModel.find().sort({ rating: -1 });
 
     return res.status(200).json(result);
   } catch (err) {
