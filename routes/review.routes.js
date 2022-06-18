@@ -4,6 +4,9 @@ const ReviewModel = require("../models/Review.model");
 const ProductModel = require("../models/Product.model");
 const UserModel = require("../models/User.model");
 
+const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Types;
+
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const attachCurrentUser = require("../middlewares/attachCurrentUser");
 
@@ -33,14 +36,15 @@ router.post("/review", isAuthenticated, attachCurrentUser, async (req, res) => {
   try {
     const { _id } = req.user;
 
-    const { productId } = req.body;
+    const { productId} = req.body;
 
-    const result = await ReviewModel.create({ ...req.body, authorId: _id });
+    const result = await ReviewModel.create({ ...req.body, authorId: ObjectId(_id) });
 
+    console.log(result)
     // Adicionar referência do review criado no modelo da acomodação
 
     await ProductModel.updateOne(
-      { _id: productId },
+      { _id: ObjectId(productId) },
       { $push: { userReviews: result._id } }
     ); // Como não precisamos incluir na resposta o resultado dessa consulta, podemos usar o updateOne que tem a sintaxe mais simples do que o findOneAndUpdate
 
