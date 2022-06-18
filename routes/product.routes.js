@@ -199,28 +199,12 @@ function mapper_reviews(obj_reviews) {
 
 // init();
 
-<<<<<<< HEAD
-//ROTAS DOS PRODUTOS 
-=======
 //ROTAS DOS PRODUTOS
->>>>>>> 0503755a3ebd5c1226d38f8444a7b2037ed7491f
 
 //GET - find (ranking)
 router.get("/products", async (req, res) => {
   try {
-<<<<<<< HEAD
-    let { page, limit } = req.query;
-
-    page = Number(page) || 0;
-    limit = Number(limit) || 1;
-
-    const result = await ProductModel.find()
-      .skip(page * limit)
-      .limit(limit)
-      .sort({ rating: -1 });
-=======
     const result = await ProductModel.find().sort({ rating: -1 });
->>>>>>> 0503755a3ebd5c1226d38f8444a7b2037ed7491f
 
     return res.status(200).json(result);
   } catch (err) {
