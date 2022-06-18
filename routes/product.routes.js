@@ -198,21 +198,9 @@ function mapper_reviews(obj_reviews) {
 }
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
 
-init();
+// init();
 
-//ROTAS DOS PRODUTOS
-
-//get - barra de busca --> Nath vai trabalhart nela (findMany())
-// router.get("/product-search", async (req, res) => {
-//   try {
-//     const result = await ProductModel.findOne({ _id });
-
-//     return res.status(200).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
+//ROTAS DOS PRODUTOS 
 
 //GET - find (ranking)
 router.get("/products", async (req, res) => {
@@ -220,7 +208,7 @@ router.get("/products", async (req, res) => {
     let { page, limit } = req.query;
 
     page = Number(page) || 0;
-    limit = Number(limit) || 20;
+    limit = Number(limit) || 1;
 
     const result = await ProductModel.find()
       .skip(page * limit)
