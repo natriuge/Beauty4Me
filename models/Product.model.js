@@ -19,5 +19,7 @@ const ProductSchema = new Schema({
   favoritedBy: [{ type: Types.ObjectId, ref: "User" }],
 });
 ProductSchema.index({ productName: "text", shortDescription: "text", longDescription: "text" });
+
 const ProductModel = model("Product", ProductSchema);
+
 module.exports = ProductModel;

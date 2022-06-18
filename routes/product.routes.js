@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
 
 const ProductModel = require("../models/Product.model");
-const ReviewModel = require("../models/Review.model");
 const UserModel = require("../models/User.model");
 
 const isAuthenticated = require("../middlewares/isAuthenticated");
@@ -200,11 +199,16 @@ function mapper_reviews(obj_reviews) {
 
 // init();
 
+<<<<<<< HEAD
 //ROTAS DOS PRODUTOS 
+=======
+//ROTAS DOS PRODUTOS
+>>>>>>> 0503755a3ebd5c1226d38f8444a7b2037ed7491f
 
 //GET - find (ranking)
 router.get("/products", async (req, res) => {
   try {
+<<<<<<< HEAD
     let { page, limit } = req.query;
 
     page = Number(page) || 0;
@@ -214,6 +218,9 @@ router.get("/products", async (req, res) => {
       .skip(page * limit)
       .limit(limit)
       .sort({ rating: -1 });
+=======
+    const result = await ProductModel.find().sort({ rating: -1 });
+>>>>>>> 0503755a3ebd5c1226d38f8444a7b2037ed7491f
 
     return res.status(200).json(result);
   } catch (err) {
@@ -274,17 +281,14 @@ router.patch("/product/:productId", isAuthenticated, async (req, res) => {
 });
 
 //GET- Barra de search
-
 router.get("/product-search", async (req, res) => {
   try {
     const searchString = req.query.q;
-    console.log(searchString.q)
-     console.log(req.query);
-    const result = await ProductModel.find(
-      {
-      $text: { $search: searchString }  
-    }
-    );
+    console.log(searchString.q);
+    console.log(req.query);
+    const result = await ProductModel.find({
+      $text: { $search: searchString },
+    });
     return res.status(201).json(result);
   } catch (err) {
     console.error(err);
@@ -292,7 +296,4 @@ router.get("/product-search", async (req, res) => {
   }
 });
 
-
 module.exports = router;
-
-
