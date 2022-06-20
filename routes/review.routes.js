@@ -29,6 +29,22 @@ router.get("/review", async (req, res) => {
   }
 });
 
+// //rota get reviews de um user
+router.get("/review/:authorId", async (req, res) => {
+  try {
+    const authorId = req.params;
+
+    const result = await ReviewModel.find(authorId._id).populate(
+      "allUserReviews"
+    );
+
+    return res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Internal server error." });
+  }
+});
+
 // // get das reviews da api sephora?
 
 //rota de criar uma review (post)
@@ -36,11 +52,14 @@ router.post("/review", isAuthenticated, attachCurrentUser, async (req, res) => {
   try {
     const { _id } = req.user;
 
-    const { productId} = req.body;
+    const { productId } = req.body;
 
-    const result = await ReviewModel.create({ ...req.body, authorId: ObjectId(_id) });
+    const result = await ReviewModel.create({
+      ...req.body,
+      authorId: ObjectId(_id),
+    });
 
-    console.log(result)
+    console.log(result);
     // Adicionar referência do review criado no modelo da acomodação
 
     await ProductModel.updateOne(
