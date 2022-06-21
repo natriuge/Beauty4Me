@@ -10,31 +10,15 @@ const { ObjectId } = mongoose.Types;
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const attachCurrentUser = require("../middlewares/attachCurrentUser");
 
-// //rota get ALL reviews from a single product 
+// //rota get ALL reviews from a single product
 router.get("/review", async (req, res) => {
   try {
     let { id } = req.query;
 
     // get review from a specific product
     const result = await ReviewModel.find({
-      productId: ObjectId(id)
+      productId: ObjectId(id),
     });
-
-    return res.status(200).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Internal server error." });
-  }
-});
-
-// //rota get reviews de um user
-router.get("/review/:authorId", async (req, res) => {
-  try {
-    const authorId = req.params;
-
-    const result = await ReviewModel.find(authorId._id).populate(
-      "allUserReviews"
-    );
 
     return res.status(200).json(result);
   } catch (err) {
@@ -135,7 +119,7 @@ router.delete(
         authorId: ObjectId(userId),
       });
 
-      console.log(review)
+      console.log(review);
 
       // Usuários somente podem deletar um review de própria autoria
       if (review) {
@@ -166,5 +150,21 @@ router.delete(
     }
   }
 );
+
+// //rota get reviews de um user (camila)
+router.get("/review/:authorId", async (req, res) => {
+  try {
+    const authorId = req.params;
+
+    const result = await ReviewModel.find(authorId._id).populate(
+      "allUserReviews"
+    );
+
+    return res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Internal server error." });
+  }
+});
 
 module.exports = router;
