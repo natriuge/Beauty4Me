@@ -10,17 +10,15 @@ const { ObjectId } = mongoose.Types;
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const attachCurrentUser = require("../middlewares/attachCurrentUser");
 
-// //rota get ALL reviews
+// //rota get ALL reviews from a single product 
 router.get("/review", async (req, res) => {
   try {
-    let { page, limit } = req.query;
+    let { id } = req.query;
 
-    page = Number(page) || 0;
-    limit = Number(limit) || 15;
-
-    const result = await ReviewModel.find()
-      .skip(page * limit)
-      .limit(limit);
+    // get review from a specific product
+    const result = await ReviewModel.find({
+      productId: ObjectId(id)
+    });
 
     return res.status(200).json(result);
   } catch (err) {
@@ -123,34 +121,38 @@ router.patch(
 
 // rota de deletar uma review (delete)
 router.delete(
-  "/review",
+  "/review/:_id",
   isAuthenticated,
   attachCurrentUser,
   async (req, res) => {
     try {
       const userId = req.user._id;
-      const reviewId = req.body._id;
+      const reviewId = req.params._id;
 
       // Verifica se a review que vai ser deletada é de propriedade do usuário logado
       const review = await ReviewModel.findOne({
-        _id: reviewId,
-        authorId: userId,
+        _id: ObjectId(reviewId),
+        authorId: ObjectId(userId),
       });
+
+      console.log(review)
 
       // Usuários somente podem deletar um review de própria autoria
       if (review) {
-        const result = await ReviewModel.findOneAndDelete({ _id: reviewId });
+        const result = await ReviewModel.findOneAndDelete({
+          _id: ObjectId(reviewId),
+        });
 
         // Deletar a referência do review criado no modelo da acomodação
         await ProductModel.updateOne(
           { _id: result.productId },
-          { $pull: { userReviews: reviewId } }
+          { $pull: { userReviews: ObjectId(reviewId) } }
         );
 
         // Deletar a referência do review criado no modelo do usuário
         await UserModel.updateOne(
-          { _id: userId },
-          { $pull: { userReviews: reviewId } }
+          { _id: ObjectId(userId) },
+          { $pull: { userReviews: ObjectId(reviewId) } }
         );
 
         return res.status(201).json(result);
