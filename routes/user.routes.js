@@ -8,6 +8,8 @@ const attachCurrentUser = require("../middlewares/attachCurrentUser");
 
 const salt_rounds = 10;
 
+const uploader = require("../config/cloudinary.config");
+
 // Crud (CREATE) - HTTP POST
 // Criar um novo usuário
 router.post("/signup", async (req, res) => {
@@ -164,5 +166,21 @@ router.get("/profile", isAuthenticated, attachCurrentUser, (req, res) => {
     return res.status(500).json({ msg: JSON.stringify(err) });
   }
 });
+
+//rota upload imagem do profile
+router.post(
+  "/upload",
+  isAuthenticated,
+  uploader.single("profilePicture"),
+  (req, res) => {
+    if (!req.file) {
+      return res
+        .status(500)
+        .json({ msgUpload: "It was not possible to upload your file" });
+    }
+
+    return res.status(201).json({ fileUrl: req.file.path });
+  }
+);
 
 module.exports = router;
