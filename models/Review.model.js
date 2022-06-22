@@ -1,6 +1,7 @@
 const { Schema, Types, model } = require("mongoose");
 
 const ReviewSchema = new Schema({
+  authorName: { type: String },
   authorId: { type: Types.ObjectId, ref: "User" },
   comment: { type: String, maxlength: 200 },
   authorRating: { type: Number },
