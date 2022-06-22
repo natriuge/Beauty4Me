@@ -14,7 +14,6 @@ const uploader = require("../config/cloudinary.config");
 // Criar um novo usuário
 router.post("/signup", async (req, res) => {
   // Requisições do tipo POST tem uma propriedade especial chamada body, que carrega a informação enviada pelo cliente
-  console.log("WHY GOD WHY", req.body);
 
   try {
     // Recuperar a senha que está vindo do corpo da requisição
@@ -23,7 +22,7 @@ router.post("/signup", async (req, res) => {
     // Verifica se o nome não está em branco
     if (!name) {
       // O código 400 significa Bad Request
-      console.log("NAME", name);
+      // console.log("NAME", name);
       return res.status(400).json({
         name: "Name is required! Please, complete the form.",
       });
@@ -146,40 +145,70 @@ router.post("/login", async (req, res) => {
 
 // cRud (READ) - HTTP GET
 // Buscar dados do usuário
-router.get("/profile", isAuthenticated, attachCurrentUser, (req, res) => {
-  console.log(req.headers);
+router.get(
+  "/profile/:_id",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req, res) => {
+    console.log(req.headers);
 
-  try {
-    // Buscar o usuário logado que está disponível através do middleware attachCurrentUser
-    const loggedInUser = req.currentUser;
+    try {
+      // Buscar o usuário logado que está disponível através do middleware attachCurrentUser
+      const loggedInUser = req.currentUser;
 
-    if (loggedInUser) {
-      // const result = await UserModel.findOne({loggedInUser}).populate("favorites")
+      if (loggedInUser) {
+        const result = await UserModel.findOne({ loggedInUser }).populate(
+          "favorites"
+        );
 
-      // Responder o cliente com os dados do usuário. O status 200 significa OK
-      return res.status(200).json(loggedInUser);
-    } else {
-      return res.status(404).json({ msg: "User not found." });
+        // Responder o cliente com os dados do usuário. O status 200 significa OK
+        return res.status(200).json(loggedInUser);
+      } else {
+        return res.status(404).json({ msg: "User not found." });
+      }
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: JSON.stringify(err) });
     }
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: JSON.stringify(err) });
   }
-});
+);
 
 //rota upload imagem do profile
-router.post(
-  "/upload",
-  isAuthenticated,
-  uploader.single("profilePicture"),
-  (req, res) => {
-    if (!req.file) {
-      return res
-        .status(500)
-        .json({ msgUpload: "It was not possible to upload your file" });
-    }
+router.post("/upload", uploader.single("profilePicture"), (req, res) => {
+  if (!req.file) {
+    return res
+      .status(500)
+      .json({ msgUpload: "It was not possible to upload your file" });
+  }
 
-    return res.status(201).json({ fileUrl: req.file.path });
+  return res.status(201).json({ fileUrl: req.file.path });
+});
+
+// atualizar foto profile no bd
+router.patch(
+  "/profile/:_id",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.currentUser;
+
+      console.log("req.body", req.body);
+      const result = await UserModel.findOneAndUpdate(
+        { _id: loggedInUser },
+        {
+          $set: {
+            profilePictureUrl: req.body.profilePictureUrl,
+          },
+        },
+        { new: true, runValidators: true }
+      );
+      //não preciso dar push no usermodel e productmodel pois é EDIÇÃO!
+      return res.status(201).json(result);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: "Internal server error." });
+    }
   }
 );
 

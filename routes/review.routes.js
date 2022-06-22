@@ -21,7 +21,7 @@ router.get("/review", async (req, res) => {
     return res.status(500).json({ msg: "Internal server error." });
   }
 });
-// // get das reviews da api sephora?
+
 //rota de criar uma review (post)
 router.post("/review", isAuthenticated, attachCurrentUser, async (req, res) => {
   try {
@@ -125,20 +125,20 @@ router.delete(
   }
 );
 
-// // //rota get reviews de um user (camila)
-router.get("/review/:authorId", async (req, res) => {
-  try {
-    const authorId = req.params;
+// // // //rota get reviews de um user (camila)
+// router.get("/review/:authorId", async (req, res) => {
+//   try {
+//     const authorId = req.params;
 
-    const result = await ReviewModel.find(authorId._id).populate(
-      "allUserReviews"
-    );
+//     const result = await ReviewModel.find(authorId._id).populate(
+//       "allUserReviews"
+//     );
 
-    return res.status(200).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Internal server error." });
-  }
-});
+//     return res.status(200).json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "Internal server error." });
+//   }
+// });
 
 module.exports = router;
