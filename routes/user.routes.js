@@ -160,6 +160,7 @@ router.get(
         const result = await UserModel.findOne({ loggedInUser }).populate(
           "favorites"
         );
+        // .populate("allUserReviews");
 
         // Responder o cliente com os dados do usuário. O status 200 significa OK
         return res.status(200).json(loggedInUser);
