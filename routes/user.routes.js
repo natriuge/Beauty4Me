@@ -150,20 +150,16 @@ router.get(
   isAuthenticated,
   attachCurrentUser,
   async (req, res) => {
-    console.log(req.headers);
-
     try {
       // Buscar o usuário logado que está disponível através do middleware attachCurrentUser
       const loggedInUser = req.currentUser;
-
       if (loggedInUser) {
-        const result = await UserModel.findOne({ loggedInUser }).populate(
-          "favorites"
-        );
-        // .populate("allUserReviews");
+        const result = await UserModel.findOne({ _id: loggedInUser })
+          .populate("favoriteProducts")
+          .populate("allUserReviews");
 
         // Responder o cliente com os dados do usuário. O status 200 significa OK
-        return res.status(200).json(loggedInUser);
+        return res.status(200).json(result);
       } else {
         return res.status(404).json({ msg: "User not found." });
       }
@@ -193,8 +189,6 @@ router.patch(
   async (req, res) => {
     try {
       const loggedInUser = req.currentUser;
-
-      console.log("req.body", req.body);
       const result = await UserModel.findOneAndUpdate(
         { _id: loggedInUser },
         {

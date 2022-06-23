@@ -280,4 +280,29 @@ router.get("/product-search", async (req, res) => {
   }
 });
 
+router.get("/specific-product/:_id", async (req, res) => {
+  try {
+    const { productId } = req.body;
+    console.log("productId", productId);
+
+    const product = await ProductModel.findOne({ productId });
+    // // .populate("userReviews", "-authorId")
+    // .populate({
+    //   path: "userReviews",
+    //   model: "Review",
+    //   select: "-authorId -productId",
+    // })
+    // .populate("favoritedBy");
+
+    if (!product) {
+      return res.status(404).json({ msg: "Product not found!" });
+    }
+
+    return res.status(200).json(product);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Internal server error" });
+  }
+});
+
 module.exports = router;
