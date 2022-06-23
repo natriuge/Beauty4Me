@@ -56,7 +56,9 @@ router.patch(
   async (req, res) => {
     try {
       const userId = req.user._id;
+      
       const reviewId = req.params._id;
+
       // Verifica se a review que vai ser atualizada é de propriedade do usuário logado
       const review = await ReviewModel.findOne({
         _id: reviewId,
