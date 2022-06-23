@@ -35,10 +35,13 @@ router.post("/review", isAuthenticated, attachCurrentUser, async (req, res) => {
     // Adicionar referência do review criado no modelo da acomodação
     await ProductModel.updateOne(
       { _id: ObjectId(productId) },
-      { $push: { userReviews: result._id } }
+      { $push: { allUserReviews: result._id } }
     ); // Como não precisamos incluir na resposta o resultado dessa consulta, podemos usar o updateOne que tem a sintaxe mais simples do que o findOneAndUpdate
     // Adicionar referência do review criado no modelo do usuário
-    await UserModel.updateOne({ _id }, { $push: { userReviews: result._id } });
+    await UserModel.updateOne(
+      { _id },
+      { $push: { allUserReviews: result._id } }
+    );
     return res.status(201).json(result);
   } catch (err) {
     console.error(err);
@@ -106,12 +109,12 @@ router.delete(
         // Deletar a referência do review criado no modelo da acomodação
         await ProductModel.updateOne(
           { _id: result.productId },
-          { $pull: { userReviews: ObjectId(reviewId) } }
+          { $pull: { allUserReviews: ObjectId(reviewId) } }
         );
         // Deletar a referência do review criado no modelo do usuário
         await UserModel.updateOne(
           { _id: ObjectId(userId) },
-          { $pull: { userReviews: ObjectId(reviewId) } }
+          { $pull: { allUserReviews: ObjectId(reviewId) } }
         );
         return res.status(201).json(result);
       } else {
@@ -124,21 +127,5 @@ router.delete(
     }
   }
 );
-
-// // // //rota get reviews de um user (camila)
-// router.get("/review/:authorId", async (req, res) => {
-//   try {
-//     const authorId = req.params;
-
-//     const result = await ReviewModel.find(authorId._id).populate(
-//       "allUserReviews"
-//     );
-
-//     return res.status(200).json(result);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "Internal server error." });
-//   }
-// });
 
 module.exports = router;
