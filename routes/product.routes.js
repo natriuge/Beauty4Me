@@ -286,13 +286,6 @@ router.get("/specific-product/:_id", async (req, res) => {
     console.log("productId", productId);
 
     const product = await ProductModel.findOne({ productId });
-    // // .populate("userReviews", "-authorId")
-    // .populate({
-    //   path: "userReviews",
-    //   model: "Review",
-    //   select: "-authorId -productId",
-    // })
-    // .populate("favoritedBy");
 
     if (!product) {
       return res.status(404).json({ msg: "Product not found!" });
