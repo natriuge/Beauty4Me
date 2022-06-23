@@ -59,14 +59,14 @@ router.post("/review", isAuthenticated, attachCurrentUser, async (req, res) => {
 
 //rota de atualizar uma review (patch)
 router.patch(
-  "/review",
+  "/review/:_id",
   isAuthenticated,
   attachCurrentUser,
   async (req, res) => {
     try {
       const userId = req.user._id;
 
-      const reviewId = req.body._id;
+      const reviewId = req.params._id;
 
       // Verifica se a review que vai ser atualizada é de propriedade do usuário logado
       const review = await ReviewModel.findOne({
