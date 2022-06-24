@@ -8,15 +8,36 @@ const attachCurrentUser = require("../middlewares/attachCurrentUser");
 
 const salt_rounds = 10;
 
+const uploader = require("../config/cloudinary.config");
+
 // Crud (CREATE) - HTTP POST
 // Criar um novo usuário
 router.post("/signup", async (req, res) => {
   // Requisições do tipo POST tem uma propriedade especial chamada body, que carrega a informação enviada pelo cliente
-  console.log(req.body);
 
   try {
     // Recuperar a senha que está vindo do corpo da requisição
-    const { password } = req.body;
+    const { name, email, password, userSkinType } = req.body;
+
+    // Verifica se o nome não está em branco
+    if (!name) {
+      // O código 400 significa Bad Request
+      // console.log("NAME", name);
+      return res.status(400).json({
+        name: "Name is required! Please, complete the form.",
+      });
+    }
+
+    // Verifica se o email não está em branco ou se o email não é válido
+    if (
+      !email ||
+      !email.match(/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$/)
+    ) {
+      // O código 400 significa Bad Request
+      return res.status(400).json({
+        email: "Email is required and must be a valid email address",
+      });
+    }
 
     // Verifica se a senha não está em branco ou se a senha não é complexa o suficiente
     if (
@@ -27,7 +48,16 @@ router.post("/signup", async (req, res) => {
     ) {
       // O código 400 significa Bad Request
       return res.status(400).json({
-        msg: "Password is required and must have at least 8 characters, uppercase and lowercase letters, numbers and special characters.",
+        password:
+          "Password is required and must have at least 8 characters, uppercase and lowercase letters, numbers and special characters.",
+      });
+    }
+
+    // Verifica se a userSkinType não está em branco
+    if (!userSkinType) {
+      // O código 400 significa Bad Request
+      return res.status(400).json({
+        userSkinType: "Skin Type is required!",
       });
     }
 
@@ -63,11 +93,30 @@ router.post("/login", async (req, res) => {
 
     console.log(user);
 
+    if (
+      !email ||
+      !email.match(/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$/)
+    ) {
+      // O código 400 significa Bad Request
+      return res.status(400).json({
+        notEmail: "Email is required and must be a valid email address",
+      });
+    }
+
     // Se o usuário não foi encontrado, significa que ele não é cadastrado
     if (!user) {
-      return res
-        .status(400)
-        .json({ msg: "This email is not yet registered in our website;" });
+      return res.status(400).json({
+        notRegister:
+          "This email is not yet registered in our website. Please, go to Sign Up!",
+      });
+    }
+
+    // Verifica se a senha não está em branco ou se a senha não é complexa o suficiente
+    if (!password) {
+      // O código 400 significa Bad Request
+      return res.status(400).json({
+        loginPassword: "Password is required.",
+      });
     }
 
     // Verificar se a senha do usuário pesquisado bate com a senha recebida pelo formulário
@@ -86,7 +135,7 @@ router.post("/login", async (req, res) => {
       });
     } else {
       // 401 Significa Unauthorized
-      return res.status(401).json({ msg: "Wrong password or email" });
+      return res.status(401).json({ wrongPassord: "Wrong password or email" });
     }
   } catch (err) {
     console.error(err);
@@ -96,25 +145,66 @@ router.post("/login", async (req, res) => {
 
 // cRud (READ) - HTTP GET
 // Buscar dados do usuário
-router.get("/profile", isAuthenticated, attachCurrentUser, (req, res) => {
-  console.log(req.headers);
+router.get(
+  "/profile/:_id",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req, res) => {
+    try {
+      // Buscar o usuário logado que está disponível através do middleware attachCurrentUser
+      const loggedInUser = req.currentUser;
+      if (loggedInUser) {
+        const result = await UserModel.findOne({ _id: loggedInUser })
+          .populate("favoriteProducts")
+          .populate("allUserReviews");
 
-  try {
-    // Buscar o usuário logado que está disponível através do middleware attachCurrentUser
-    const loggedInUser = req.currentUser;
-
-    if (loggedInUser) {
-      // const result = await UserModel.findOne({loggedInUser}).populate("favorites")
-
-      // Responder o cliente com os dados do usuário. O status 200 significa OK
-      return res.status(200).json(loggedInUser);
-    } else {
-      return res.status(404).json({ msg: "User not found." });
+        // Responder o cliente com os dados do usuário. O status 200 significa OK
+        return res.status(200).json(result);
+      } else {
+        return res.status(404).json({ msg: "User not found." });
+      }
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: JSON.stringify(err) });
     }
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: JSON.stringify(err) });
   }
+);
+
+//rota upload imagem do profile
+router.post("/upload", uploader.single("profilePicture"), (req, res) => {
+  if (!req.file) {
+    return res
+      .status(500)
+      .json({ msgUpload: "It was not possible to upload your file" });
+  }
+
+  return res.status(201).json({ fileUrl: req.file.path });
 });
+
+// atualizar foto profile no bd
+router.patch(
+  "/profile/:_id",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.currentUser;
+      const result = await UserModel.findOneAndUpdate(
+        { _id: loggedInUser },
+        {
+          $set: {
+            profilePictureUrl: req.body.profilePictureUrl,
+          },
+        },
+        { new: true, runValidators: true }
+      );
+      //não preciso dar push no usermodel e productmodel pois é EDIÇÃO!
+      return res.status(201).json(result);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: "Internal server error." });
+    }
+  }
+);
 
 module.exports = router;
