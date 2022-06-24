@@ -197,7 +197,7 @@ function mapper_reviews(obj_reviews) {
 }
 //pegar o obj vindo da api e passar por cada review e dps jogar isso no map
 
-// init();
+init();
 
 //ROTAS DOS PRODUTOS
 
